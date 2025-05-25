@@ -5,8 +5,12 @@ require_once "Config/database.php";
 
 // use database
 
-
 // database conn
+
+//start from front
+
+// check if front show all page of front another show all page of dashboard
+
 
 
 /******************  route system **********************/
