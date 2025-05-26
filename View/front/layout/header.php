@@ -1,3 +1,6 @@
+<?php 
+use App\Massage;
+?>
 <!doctype html>
 <html class="no-js" lang="en">
 
@@ -121,7 +124,7 @@
                         <div id="menu" class="text-left ">
                             <ul class="offcanvas_main_menu">
                                 <li class="menu-item-has-children active">
-                                    <a href="#">Home</a>
+                                    <a href="index.php?page=home">Home</a>
                                 </li>
                                 <li class="menu-item-has-children">
                                     <a href="product-details.html">product</a>
@@ -189,7 +192,11 @@
                         <div class="col-lg-6 col-md-6">
                             <div class="top_right text-right">
                                 <ul>
-                                   <li><a href="my-account.html">Account</a></li> 
+                                    <?php if (isset($_SESSION['user'])): ?>
+                                   <li><a href="index.php?page=Logout">Logout</a></li>
+                                    <?php else: ?>
+                                   <li><a href="index.php?page=Login">Login</a></li> 
+                                   <?php endif; ?>
                                    <li><a href="checkout.html">Checkout</a></li> 
                                 </ul>
                             </div>   
@@ -204,7 +211,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-3 col-md-6">
                             <div class="logo">
-                                <a href="index-2.html"><img src="public/assets/front/img/logo/logo.png" alt=""></a>
+                                <a href="index.php?page=home"><img src="public/assets/front/img/logo/logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-lg-9 col-md-6">
@@ -289,7 +296,7 @@
                             <div class="main_menu menu_position"> 
                                 <nav>  
                                     <ul>
-                                        <li><a href="index-2.html">home</a></li>
+                                        <li><a href="index.php?page=home">home</a></li>
                                         <li><a href="product-details.html">Product</a></li>
                                         
                                         <li><a class="active" href="#">pages <i class="fa fa-angle-down"></i></a>
@@ -324,3 +331,6 @@
             <!--header bottom end-->
         </div> 
     </header>
+    <?php
+    Massage::show_Massages();
+    ?>

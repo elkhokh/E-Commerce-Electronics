@@ -1,6 +1,6 @@
 {
     "name": "dell/e-commerce",
-    "license": "mit",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "App\\": "app/"
