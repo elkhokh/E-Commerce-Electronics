@@ -186,8 +186,9 @@ use App\Massage;
                     <div class="row align-items-center">
                         <div class="col-lg-6 col-md-6">
                             <div class="support_info">
-                                 <?php if (isset($_SESSION['user'])): ?>
-                                <p>Email: <a href="mailto:"><?=$_SESSION['user']['email']?></a></p>
+                                 <?php use App\User;
+                                 if (isset($_SESSION['user'])): ?>
+                                <p>Email: <a href="mailto:"><?= User::find_by_id($db,$_SESSION['user']['id'])->get_email() ?></a></p>
                                 <?php endif;?>
                             </div>
                         </div>

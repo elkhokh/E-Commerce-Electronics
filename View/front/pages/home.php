@@ -77,11 +77,11 @@
             <div class="row justify-content-center">
                 <?php
                 use App\Product;
-                foreach (Product::getAll($db) as $product) :
+                foreach (Product::get_three_product($db) as $product) :
                 ?>
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
                     <div class="single-tranding">
-                        <a href="product-details.php?id=<?= $product->getId() ?>">
+                        <a href="index.php?page=product_details&id=<?= $product->getId() ?>">
                             <div class="tranding-pro-img">
                                 <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>">
                             </div>
@@ -207,113 +207,14 @@
 
     
     <!--product details start-->
-    <div class="product_details mt-60 mb-60">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6 col-md-6">
-                    <div class="product-details-tab">
-                        <div id="img-1" class="zoomWrapper single-zoom">
-                            <a href="#">
-                                <img id="zoom1" src="assets/img/product/details-1.jpg" data-zoom-image="assets/img/product/details-1.jpg" alt="big-1">
-                            </a>
-                        </div>
-                        <div class="single-zoom-thumb">
-                            <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
-                                <li>
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="assets/img/product/details-2.jpg" data-zoom-image="assets/img/product/details-2.jpg">
-                                        <img src="assets/img/product/details-2.jpg" alt="zo-th-1"/>
-                                    </a>
-
-                                </li>
-                                <li >
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="assets/img/product/details-3.jpg" data-zoom-image="assets/img/product/details-3.jpg">
-                                        <img src="assets/img/product/details-3.jpg" alt="zo-th-1"/>
-                                    </a>
-
-                                </li>
-                                <li >
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="assets/img/product/details-4.jpg" data-zoom-image="assets/img/product/details-4.jpg">
-                                        <img src="assets/img/product/details-4.jpg" alt="zo-th-1"/>
-                                    </a>
-
-                                </li>
-                                <li >
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="assets/img/product/details-1.jpg" data-zoom-image="assets/img/product/details-1.jpg">
-                                        <img src="assets/img/product/details-1.jpg" alt="zo-th-1"/>
-                                    </a>
-
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                    <div class="product_d_right">
-                        <form action="#">
-                            
-                            <h1>Meyoji Robast Drone Fusce ultricies massa</h1>
-                            <div class=" product_ratting">
-                                <ul>
-                                    <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                    <li class="review"><a href="#"> (250 reviews) </a></li>
-                                </ul>
-                                
-                            </div>
-                            <div class="price_box">
-                                <span class="current_price">$70.00</span>
-                                <span class="old_price">$80.00</span>                                
-                            </div>
-                            <div class="product_desc">
-                                <ul>
-                                    <li>In Stock</li>
-                                    <li>Free delivery available*</li>
-                                    <li>Sale 30% Off Use Code : 'Drophut'</li>
-                                </ul>
-                                <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will</p>
-                            </div>
-                            <div class="product_timing">
-                                <div data-countdown="2021/6/28"></div>
-                            </div>
-                            <div class="product_variant color">
-                                <h3>Available Options</h3>
-                                <label>color</label>
-                                <ul>
-                                    <li class="color1"><a href="#"></a></li>
-                                    <li class="color2"><a href="#"></a></li>
-                                    <li class="color3"><a href="#"></a></li>
-                                    <li class="color4"><a href="#"></a></li>
-                                </ul>
-                            </div>
-                            <div class="product_variant quantity">
-                                <label>quantity</label>
-                                <input min="1" max="100" value="1" type="number">
-                                <button class="button" type="submit">Buy now</button>  
-                                
-                            </div>
-                            <div class="product_meta">
-                                <span>Category: <a href="#">Drone</a></span>
-                            </div>
-                            
-                        </form>
-                        <div class="priduct_social">
-                            <ul>
-                                <li><a class="facebook" href="#" title="facebook"><i class="fa fa-facebook"></i> Like</a></li>           
-                                <li><a class="twitter" href="#" title="twitter"><i class="fa fa-twitter"></i> tweet</a></li>           
-                                <li><a class="pinterest" href="#" title="pinterest"><i class="fa fa-pinterest"></i> save</a></li>           
-                                <li><a class="google-plus" href="#" title="google +"><i class="fa fa-google-plus"></i> share</a></li>        
-                                <li><a class="linkedin" href="#" title="linkedin"><i class="fa fa-linkedin"></i> linked</a></li>        
-                            </ul>      
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>    
-    </div>
+<?php
+$allProducts = Product::getAll($db);
+if (!empty($allProducts)) {
+    $randomProduct = $allProducts[array_rand($allProducts)];
+    $_GET['id'] = $randomProduct->getId();
+    require_once 'product/product_details.php';
+}
+?>
     <!--product details end-->
 
     
@@ -347,63 +248,44 @@
                 </div>
             </div>
             <div class="row justify-content-center">
+                <?php
+                foreach (Product::get_three_product($db,3) as $product) :
+                ?>
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div class="single-tranding mb-30">
-                        <a href="product-details.html">
+                    <div class="single-tranding">
+                        <a href="product-details.php?id=<?= $product->getId() ?>">
                             <div class="tranding-pro-img">
-                                <img src="assets/img/product/tranding-1.jpg" alt="">
+                                <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>">
                             </div>
                             <div class="tranding-pro-title">
-                                <h3>Meyoji Robast Drone</h3>
-                                <h4>Drone</h4>
+                                <h3><?= $product->getName() ?></h3>
+                                <?php 
+                                $subcategory = $product->getSubcategory($db);
+                                if ($subcategory): 
+                                ?>
+                                    <h4><?= $subcategory['name'] ?></h4>
+                                <?php endif; ?>
                             </div>
                             <div class="tranding-pro-price">
                                 <div class="price_box">
-                                    <span class="current_price">$70.00</span>
-                                    <span class="old_price">$80.00</span>
+                                    <span class="current_price">$<?= $product->getFinalPrice() ?></span>
+                                    <?php if ($product->getDiscount() > 0): ?>
+                                        <span class="old_price">$<?= $product->getPrice() ?></span>
+                                    <?php endif; ?>
                                 </div>
+                            </div>
+                            <div class="product-colors">
+                                <?php foreach ($product->getColors($db) as $color): ?>
+                                    <span class="color-option" 
+                                          style="background-color: <?= $color['hex_code'] ?>" 
+                                          title="<?= $color['name'] ?>">
+                                    </span>
+                                <?php endforeach; ?>
                             </div>
                         </a>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div class="single-tranding mb-30">
-                        <a href="product-details.html">
-                            <div class="tranding-pro-img">
-                                <img src="assets/img/product/tranding-2.jpg" alt="">
-                            </div>
-                            <div class="tranding-pro-title">
-                                <h3>Ut praesentium earum</h3>
-                                <h4>Mevrik</h4>
-                            </div>
-                            <div class="tranding-pro-price">
-                                <div class="price_box">
-                                    <span class="current_price">$70.00</span>
-                                    <span class="old_price">$80.00</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div class="single-tranding mb-30">
-                        <a href="product-details.html">
-                            <div class="tranding-pro-img">
-                                <img src="assets/img/product/tranding-3.jpg" alt="">
-                            </div>
-                            <div class="tranding-pro-title">
-                                <h3>Consectetur adipisicing</h3>
-                                <h4>Flyer</h4>
-                            </div>
-                            <div class="tranding-pro-price">
-                                <div class="price_box">
-                                    <span class="current_price">$70.00</span>
-                                    <span class="old_price">$80.00</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section><!--Other product-->
