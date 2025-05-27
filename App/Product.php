@@ -82,7 +82,7 @@ class Product {
             $stmt = $db->prepare($query);
             return $stmt->execute([
                 'product_id' => $this->id,
-                'image_path' => $image_path
+                'image_path' => $image_path['path']
             ]);
         } catch (\PDOException $e) {
             return false;
@@ -135,15 +135,25 @@ class Product {
     // Get all products
     public static function getAll(PDO $db): array {
         try {
-            $query = "SELECT * FROM products";
+            $query = "SELECT * FROM products  WHERE status = 1 ";
             $stmt = $db->query($query);
-            // var_dump($stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Product'));
-            // exit;
             return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Product');
         } catch (\PDOException $e) {
             return [];
         }
     }
+
+    public static function get_three_product(PDO $db, int $limit = 3): array {
+    try {
+        $query = "SELECT * FROM products WHERE status = 1 ORDER BY RAND() LIMIT :limit";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Product');
+    } catch (\PDOException $e) {
+        return [];
+    }
+}
 
     // Update product
     public function update(PDO $db, string $name, string $description, float $price, float $discount, int $quantity, string $main_image, int $category_id, ?int $subcategory_id = null, array $colors = []): bool {

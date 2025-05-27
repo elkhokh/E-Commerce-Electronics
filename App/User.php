@@ -60,7 +60,6 @@ class User
             $id = (int) $pdo->lastInsertId();
             $_SESSION["user"] = [
                 "name" => $name,
-                "email" => $email,
                 "id" => $id
             ];
             return new self($id, $name, $email, $password, $role = "user");
@@ -88,6 +87,17 @@ class User
         }
         return null;
     }
+    static function find_by_id(PDO $pdo, string $id): ?User
+    {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id");
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return new User($row['id'], $row['name'], $row['email'], $row['password'], $row['role']);
+        }
+        return null;
+    }
     static function login_user(PDO $pdo, string $email, string $password): bool
     {
         $user = self::find_by_email($pdo, $email);
@@ -95,7 +105,6 @@ class User
             if (password_verify($password, $user->get_password())) {
                 $_SESSION["user"] = [
                     "name" => $user->get_name(),
-                    "email" => $user->get_email(),
                     "id" => $user->get_id()
                 ];
                 return true;

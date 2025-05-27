@@ -49,6 +49,7 @@ if ($user_type) {
         'Login_controller' => 'App/controller/auth/Login_controller.php',
         'Logout' => 'App/controller/auth/Logout_controller.php',
         'change_password' => 'App/controller/auth/change_password_controller.php',
+        'product_details' => 'View/front/pages/product/product_details.php',
         'Login' => 'View/front/pages/auth/login.php'
     ];
 
