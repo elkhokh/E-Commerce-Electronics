@@ -9990,7 +9990,26 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
     margin-bottom: 12px;
   }
 }
+.product-colors {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 5px;
+}
 
+.color-option {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.color-option:hover {
+    transform: scale(1.2);
+}
 /*privacy policy css end*/
 
 /*# sourceMappingURL=style.css.map */

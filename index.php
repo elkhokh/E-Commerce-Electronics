@@ -13,7 +13,8 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 // Skip database connection for maintenance page
 if ($page !== 'Maintenance') {
     try {
-        $db = Database::get_instance($config)->get_connection();
+        // $db = Database::get_instance($config)->get_connection();
+        
     } catch (PDOException $th) {
         header('Location: index.php?page=Maintenance');
         exit;
