@@ -54,7 +54,7 @@
                         </div>                      
                         <div class="col-xl-6 col-md-6">
                             <div class="slider_content">
-                                <img src="assets/img/product/3.png" alt="">
+                                <img src="Public/assets/front/img/product/3.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -75,63 +75,45 @@
                 </div>
             </div>
             <div class="row justify-content-center">
+                <?php
+                use App\Product;
+                foreach (Product::getAll($db) as $product) :
+                ?>
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
                     <div class="single-tranding">
-                        <a href="product-details.html">
+                        <a href="product-details.php?id=<?= $product->getId() ?>">
                             <div class="tranding-pro-img">
-                                <img src="assets/img/product/tranding-1.jpg" alt="">
+                                <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>">
                             </div>
                             <div class="tranding-pro-title">
-                                <h3>Meyoji Robast Drone</h3>
-                                <h4>Drone</h4>
+                                <h3><?= $product->getName() ?></h3>
+                                <?php 
+                                $subcategory = $product->getSubcategory($db);
+                                if ($subcategory): 
+                                ?>
+                                    <h4><?= $subcategory['name'] ?></h4>
+                                <?php endif; ?>
                             </div>
                             <div class="tranding-pro-price">
                                 <div class="price_box">
-                                    <span class="current_price">$70.00</span>
-                                    <span class="old_price">$80.00</span>
+                                    <span class="current_price">$<?= $product->getFinalPrice() ?></span>
+                                    <?php if ($product->getDiscount() > 0): ?>
+                                        <span class="old_price">$<?= $product->getPrice() ?></span>
+                                    <?php endif; ?>
                                 </div>
+                            </div>
+                            <div class="product-colors">
+                                <?php foreach ($product->getColors($db) as $color): ?>
+                                    <span class="color-option" 
+                                          style="background-color: <?= $color['hex_code'] ?>" 
+                                          title="<?= $color['name'] ?>">
+                                    </span>
+                                <?php endforeach; ?>
                             </div>
                         </a>
                     </div>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div class="single-tranding">
-                        <a href="product-details.html">
-                            <div class="tranding-pro-img">
-                                <img src="assets/img/product/tranding-2.jpg" alt="">
-                            </div>
-                            <div class="tranding-pro-title">
-                                <h3>Ut praesentium earum</h3>
-                                <h4>Mevrik</h4>
-                            </div>
-                            <div class="tranding-pro-price">
-                                <div class="price_box">
-                                    <span class="current_price">$70.00</span>
-                                    <span class="old_price">$80.00</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div class="single-tranding">
-                        <a href="product-details.html">
-                            <div class="tranding-pro-img">
-                                <img src="assets/img/product/tranding-3.jpg" alt="">
-                            </div>
-                            <div class="tranding-pro-title">
-                                <h3>Consectetur adipisicing</h3>
-                                <h4>Flyer</h4>
-                            </div>
-                            <div class="tranding-pro-price">
-                                <div class="price_box">
-                                    <span class="current_price">$70.00</span>
-                                    <span class="old_price">$80.00</span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section><!--Tranding product-->
@@ -149,27 +131,27 @@
             <div class="row justify-content-center">
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
                     <div class="single-features">
-                        <img src="assets/img/icon/1.png" alt="">
+                        <img src="Public/assets/front/img/icon/1.png" alt="">
                         <h3>Impressive Distance</h3>
                         <p>consectetur adipisicing elit. Ut praesentium earum, blanditiis, voluptatem repellendus rerum voluptatibus dignissimos</p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
                     <div class="single-features">
-                        <img src="assets/img/icon/2.png" alt="">
+                        <img src="Public/assets/front/img/icon/2.png" alt="">
                         <h3>100% self safe</h3>
                         <p>consectetur adipisicing elit. Ut praesentium earum, blanditiis, voluptatem repellendus rerum voluptatibus dignissimos</p>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
                     <div class="single-features">
-                        <img src="assets/img/icon/3.png" alt="">
+                        <img src="Public/assets/front/img/icon/3.png" alt="">
                         <h3>Awesome Support</h3>
                         <p>consectetur adipisicing elit. Ut praesentium earum, blanditiis, voluptatem repellendus rerum voluptatibus dignissimos</p>
                     </div>
                 </div>
                 <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12 col-12">
-                    <a href="#"><img src="assets/img/product/2.png" alt=""></a>
+                    <a href="#"><img src="Public/assets/front/img/product/2.png" alt=""></a>
                 </div>
             </div>
         </div>
@@ -609,4 +591,6 @@
         </div>
     </section>
     <!--shipping area end-->
+	
+
 	
