@@ -60,6 +60,7 @@ class User
             $id = (int) $pdo->lastInsertId();
             $_SESSION["user"] = [
                 "name" => $name,
+                "email" => $email,
                 "id" => $id
             ];
             return new self($id, $name, $email, $password, $role = "user");
@@ -94,6 +95,7 @@ class User
             if (password_verify($password, $user->get_password())) {
                 $_SESSION["user"] = [
                     "name" => $user->get_name(),
+                    "email" => $user->get_email(),
                     "id" => $user->get_id()
                 ];
                 return true;

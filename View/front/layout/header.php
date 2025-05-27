@@ -186,12 +186,14 @@ use App\Massage;
                     <div class="row align-items-center">
                         <div class="col-lg-6 col-md-6">
                             <div class="support_info">
-                                <p>Email: <a href="mailto:">support@drophunt.com</a></p>
+                                 <?php if (isset($_SESSION['user'])): ?>
+                                <p>Email: <a href="mailto:"><?=$_SESSION['user']['email']?></a></p>
+                                <?php endif;?>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <div class="top_right text-right">
-                                <ul>
+                                <ul> 
                                     <?php if (isset($_SESSION['user'])): ?>
                                    <li><a href="index.php?page=Logout">Logout</a></li>
                                     <?php else: ?>
