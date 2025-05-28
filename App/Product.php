@@ -120,8 +120,6 @@ class Product {
                 $product->category_id = $row['category_id'];
                 $product->subcategory_id = $row['subcategory_id'];
                 $product->status = $row['status'];
-                
-                // تحميل الألوان
                 $product->colors = $product->getColors($db);
                 
                 return $product;
@@ -185,9 +183,8 @@ class Product {
             ]);
 
             if ($result && !empty($colors)) {
-                // حذف الألوان القديمة
+               
                 $this->clearColors($db);
-                // إضافة الألوان الجديدة
                 foreach ($colors as $color_id) {
                     $this->addColor($db, $color_id);
                 }
@@ -294,7 +291,7 @@ class Product {
         }
     }
 
-    // دالة للحصول على ألوان المنتج
+ 
     public function getColors(PDO $db): array {
         try {
             $query = "SELECT c.* FROM colors c 
@@ -308,7 +305,7 @@ class Product {
         }
     }
 
-    // دالة لإضافة لون للمنتج
+
     public function addColor(PDO $db, int $color_id): bool {
         try {
             $query = "INSERT INTO product_colors (product_id, color_id) 
@@ -323,7 +320,6 @@ class Product {
         }
     }
 
-    // دالة لإزالة لون من المنتج
     public function removeColor(PDO $db, int $color_id): bool {
         try {
             $query = "DELETE FROM product_colors 
@@ -338,7 +334,7 @@ class Product {
         }
     }
 
-    // دالة لحذف جميع ألوان المنتج
+
     public function clearColors(PDO $db): bool {
         try {
             $query = "DELETE FROM product_colors WHERE product_id = :product_id";
@@ -349,7 +345,7 @@ class Product {
         }
     }
 
-    // Getter للألوان
+
     public function getColorsList(): array {
         return $this->colors;
     }
