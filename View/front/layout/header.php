@@ -1,6 +1,11 @@
 <?php 
 use App\Massage;
-?>
+ use App\Cart;
+ if (isset($_SESSION['user']['id'])) {
+ $cart=new Cart($_SESSION['user']['id']);
+ $cart->load($db);
+ }
+ ?>
 <!doctype html>
 <html class="no-js" lang="en">
 
@@ -69,47 +74,41 @@ use App\Massage;
                             </div>
                             <div class="mini_cart_wrapper">
                                 <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
-                                <span class="cart_quantity">2</span>
+                                <?php if(isset($cart) && $cart->getItemsCount() > 0): ?>
+                                    <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
+                                <?php endif; ?>
                                 <!--mini cart-->
-                                 <div class="mini_cart">
+                                <div class="mini_cart">
+                                 <?php
+                                foreach ($cart->getItems()as  $item) :
+                                ?>
                                     <div class="cart_item">
                                        <div class="cart_img">
-                                           <a href="#"><img src="public/assets/front/img/s-product/product.jpg" alt=""></a>
+                                           <a href="#"><img src="<?=$item->getProduct()->getMainImage()?>" alt=""></a>
                                        </div>
                                         <div class="cart_info">
-                                            <a href="#">Sit voluptatem rhoncus sem lectus</a>
-                                            <p>Qty: 1 X <span> $60.00 </span></p>    
+                                            <a href="#"><?=$item->getProduct()->getName()?></a>
+                                            <p>Qty: <?=$item->getQuantity()?> X <span> <?=$item->getProduct()->getPrice()?> </span></p>   
                                         </div>
                                         <div class="cart_remove">
-                                            <a href="#"><i class="ion-android-close"></i></a>
+                                            <a href="index.php?page=Cart_controller&action=remove&id=<?=$item->getProductId()?>"><i class="ion-android-close"></i></a>
                                         </div>
                                     </div>
-                                    <div class="cart_item">
-                                       <div class="cart_img">
-                                           <a href="#"><img src="public/assets/front/img/s-product/product2.jpg" alt=""></a>
-                                       </div>
-                                        <div class="cart_info">
-                                            <a href="#">Natus erro at congue massa commodo</a>
-                                            <p>Qty: 1 X <span> $60.00 </span></p>   
-                                        </div>
-                                        <div class="cart_remove">
-                                            <a href="#"><i class="ion-android-close"></i></a>
-                                        </div>
-                                    </div>
+                                    <?php endforeach;?>
                                     <div class="mini_cart_table">
                                         <div class="cart_total">
                                             <span>Sub total:</span>
-                                            <span class="price">$138.00</span>
+                                            <span class="price">$<?=$cart->getFinalTotal()?></span>
                                         </div>
                                         <div class="cart_total mt-10">
                                             <span>total:</span>
-                                            <span class="price">$138.00</span>
+                                            <span class="price">$<?=$cart->getFinalTotal()?></span>
                                         </div>
                                     </div>
 
                                     <div class="mini_cart_footer">
                                        <div class="cart_button">
-                                            <a href="cart.html">View cart</a>
+                                            <a href="index.php?page=Cart">View cart</a>
                                         </div>
                                         <div class="cart_button">
                                             <a href="checkout.html">Checkout</a>
@@ -233,47 +232,41 @@ use App\Massage;
                                     </div>
                                     <div class="mini_cart_wrapper">
                                         <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
-                                        <span class="cart_quantity">2</span>
+                                        <?php if(isset($cart) && $cart->getItemsCount() > 0): ?>
+                                            <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
+                                        <?php endif; ?>
                                         <!--mini cart-->
                                          <div class="mini_cart">
-                                            <div class="cart_item">
+                                             <div class="cart_item">
+                                              <?php
+                                             foreach ($cart->getItems()as  $item) :
+                                              ?>
                                                <div class="cart_img">
-                                                   <a href="#"><img src="public/assets/front/img/s-product/product.jpg" alt=""></a>
+                                                   <a href="#"><img src="<?=$item->getProduct()->getMainImage()?>" alt=""></a>
                                                </div>
                                                 <div class="cart_info">
-                                                    <a href="#">Sit voluptatem rhoncus sem lectus</a>
-                                                    <p>Qty: 1 X <span> $60.00 </span></p>    
+                                                    <a href="#"><?=$item->getProduct()->getName()?></a>
+                                                    <p>Qty: <?=$item->getQuantity()?> X <span> <?=$item->getProduct()->getPrice()?> </span></p>      
                                                 </div>
                                                 <div class="cart_remove">
-                                                    <a href="#"><i class="ion-android-close"></i></a>
+                                                    <a href="index.php?page=Cart_controller&action=remove&id=<?=$item->getProductId()?>"><i class="ion-android-close"></i></a>
                                                 </div>
-                                            </div>
-                                            <div class="cart_item">
-                                               <div class="cart_img">
-                                                   <a href="#"><img src="public/assets/front/img/s-product/product2.jpg" alt=""></a>
-                                               </div>
-                                                <div class="cart_info">
-                                                    <a href="#">Natus erro at congue massa commodo</a>
-                                                    <p>Qty: 1 X <span> $60.00 </span></p>   
-                                                </div>
-                                                <div class="cart_remove">
-                                                    <a href="#"><i class="ion-android-close"></i></a>
-                                                </div>
+                                             <?php endforeach;?>
                                             </div>
                                             <div class="mini_cart_table">
                                                 <div class="cart_total">
                                                     <span>Sub total:</span>
-                                                    <span class="price">$138.00</span>
+                                                    <span class="price">$<?=$cart->getFinalTotal()?></span>
                                                 </div>
                                                 <div class="cart_total mt-10">
                                                     <span>total:</span>
-                                                    <span class="price">$138.00</span>
+                                                    <span class="price">$<?=$cart->getFinalTotal()?></span>
                                                 </div>
                                             </div>
 
                                             <div class="mini_cart_footer">
                                                <div class="cart_button">
-                                                    <a href="cart.html">View cart</a>
+                                                    <a href="index.php?page=Cart">View cart</a>
                                                 </div>
                                                 <div class="cart_button">
                                                     <a href="checkout.html">Checkout</a>

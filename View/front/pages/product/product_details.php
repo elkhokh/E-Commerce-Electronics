@@ -17,27 +17,39 @@
                    <div class="product-details-tab">
                         <div id="img-1" class="zoomWrapper single-zoom">
                             <a href="#">
-                                <img id="zoom1" src="<?=$product->getMainImage()?>" data-zoom-image="<?=$product->getMainImage()?>" alt="big-1">
+                                <img id="zoom1" src="<?=$product->getMainImage()?>" 
+                                     data-zoom-image="<?=$product->getMainImage()?>" 
+                                     alt="<?=$product->getName()?>">
                             </a>
                         </div>
                         <div class="single-zoom-thumb">
                             <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
                                 <?php
-                                foreach ($product->getImages($db) as  $img) :
+                                $images = $product->getImages($db);
+                                if (!empty($images)):
+                                    foreach ($images as $img):
                                 ?>
                                 <li>
-                                    <a href="#" class="elevatezoom-gallery active" data-update="" data-image="<?=$img['image_path']?>" data-zoom-image="<?=$img['image_path']?>">
-                                        <img src="<?=$img['image_path']?>" alt="zo-th-1"/>
+                                    <a href="#" class="elevatezoom-gallery" 
+                                       data-update="" 
+                                       data-image="<?=$img['image_path']?>" 
+                                       data-zoom-image="<?=$img['image_path']?>"
+                                       >
+                                        <img src="<?=$img['image_path']?>" 
+                                             alt="<?=$product->getName()?>"/>
                                     </a>
                                 </li>
-                                <?php endforeach;?>
+                                <?php 
+                                    endforeach;
+                                endif;
+                                ?>
                             </ul>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6">
                     <div class="product_d_right">
-                       <form action="#">
+                       
                            
                             <h1><?=$product->getName()?></h1>
                             <div class=" product_ratting">
@@ -83,9 +95,11 @@
                             </div>
                             <div class="product_variant quantity">
                                 <label>quantity</label>
-                                <input min="1" max="100" value="1" type="number">
-                                <button class="button" type="submit">add to cart</button>  
-                                
+                                <form action="index.php?page=Cart_controller&action=add" method="post">
+                                <input min="1" name="quantity" max="100" value="1" type="number">
+                                <input type="hidden" name="id" value="<?= $product->getId()?>">
+                                <button class="button"  type="submit">add to cart</button>  
+                                </form>
                             </div>
                             <div class=" product_d_action">
                                <ul>
@@ -97,7 +111,7 @@
                                 <span>Category: <a href="#"><?=$product->getCategory($db)['name']?></a></span>
                             </div>
                             
-                        </form>
+                        
                         <div class="priduct_social">
                             <ul>
                                 <li><a class="facebook" href="#" title="facebook"><i class="fa fa-facebook"></i> Like</a></li>           
@@ -233,4 +247,7 @@
         </div>    
     </div>  
     <!--product info end-->
+
+    <!-- إضافة JavaScript لتحديث الصورة الرئيسية -->
+
 
