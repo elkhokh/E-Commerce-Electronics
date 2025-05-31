@@ -19,7 +19,7 @@ class Cart {
     public function load(PDO $db): bool {
         try {
             $this->items = CartItem::getUserCart($db, $this->user_id);
-            $this->calculateTotals();
+            $this->calculateTotals($db);
             return true;
         } catch (\Exception $e) {
             return false;
@@ -40,7 +40,7 @@ class Cart {
             $cartItem = CartItem::create($db, $this->user_id, $product_id, $quantity);
             if ($cartItem) {
                 $this->items[] = $cartItem;
-                $this->calculateTotals();
+                $this->calculateTotals($db);
                 return true;
             }
             return false;
@@ -55,7 +55,7 @@ class Cart {
             foreach ($this->items as $item) {
                 if ($item->getProductId() == $product_id) {
                     if ($item->updateQuantity($db, $quantity)) {
-                        $this->calculateTotals();
+                        $this->calculateTotals($db);
                         return true;
                     }
                     return false;
@@ -75,7 +75,7 @@ class Cart {
                     if ($item->delete($db)) {
                         unset($this->items[$key]);
                         $this->items = array_values($this->items);
-                        $this->calculateTotals();
+                        $this->calculateTotals($db);
                         return true;
                     }
                     return false;
@@ -95,31 +95,31 @@ class Cart {
                 }
             }
             $this->items = [];
-            $this->calculateTotals();
+            $this->calculateTotals($db);
             return true;
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    private function calculateTotals(): void {
+    private function calculateTotals($db): void {
         $this->total = 0;
         foreach ($this->items as $item) {
-            $this->total += $item->getTotalPrice();
+            $this->total += $item->getTotalPrice($db);
         }
         $this->final_total = $this->total - $this->discount;
     }
 
 
-    public function applyDiscount(float $discount): void {
+    public function applyDiscount($db,float $discount): void {
         $this->discount = $discount;
-        $this->calculateTotals();
+        $this->calculateTotals($db);
     }
 
 
-    public function removeDiscount(): void {
+    public function removeDiscount($db): void {
         $this->discount = 0;
-        $this->calculateTotals();
+        $this->calculateTotals($db);
     }
 
   

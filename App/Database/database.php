@@ -8,13 +8,13 @@ class Database  {
     private static ?Database $instance = null;
     private  PDO $connection;
   private function __construct(array $config)  {
-    try {
+   // try {
         $dsn="mysql: host={$config['host']};dbname={$config['dbname']}";
         $this->connection=new PDO($dsn,$config['username'],$config['password']);
-    } catch (PDOException $th) {
-        header('Location: index.php?page=Maintenance');
-        exit;
-    }
+    // } catch (PDOException $th) {
+    //     // header('Location: index.php?page=Maintenance');
+    //     // exit;
+    // }
     
   } 
   static function get_instance(array $config):Database  {

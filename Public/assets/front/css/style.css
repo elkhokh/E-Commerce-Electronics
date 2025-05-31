@@ -10010,6 +10010,45 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 .color-option:hover {
     transform: scale(1.2);
 }
+
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.like-button.clicked i {
+    animation: pulse 0.3s ease;
+}
+
+
+.like-button.rotate i {
+    transform: rotate(360deg);
+    transition: transform 0.5s ease;
+}
+.rating-stars {
+  font-size: 24px;
+  color: #ffc107;
+  cursor: pointer;
+}
+
+.rating-stars i {
+  margin-right: 5px;
+}
+
+.rating-stars i:hover,
+.rating-stars i.active {
+  color: #ffc107;
+}
+
+.product_ratting ul li a {
+  color: #ffc107;
+}
+
+.product_ratting ul li a:hover {
+  color: #ffc107;
+}
 /*privacy policy css end*/
 
 /*# sourceMappingURL=style.css.map */

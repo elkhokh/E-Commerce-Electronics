@@ -12,7 +12,7 @@ class Cart_controller
 
         if (!isset($_SESSION['user']['id'])) {
             Massage::set_Massages('error', 'Please login first to add items to cart');
-            header('Location: login.php');
+            header('Location: index.php?page=Cart');
             exit;
         }
         $user_id = $_SESSION['user']['id'];

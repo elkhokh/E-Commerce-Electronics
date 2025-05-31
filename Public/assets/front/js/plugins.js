@@ -2412,6 +2412,70 @@ if ( typeof Object.create !== 'function' ) {
 
 		});
 	};
+	// Public/assets/front/js/reviews.js
+document.addEventListener('DOMContentLoaded', function() {
+    const ratingStars = document.querySelectorAll('.rating-stars i');
+    const reviewForm = document.getElementById('reviewForm');
+    let selectedRating = 0;
+
+    // تفعيل النجوم عند التحويم
+    ratingStars.forEach(star => {
+        star.addEventListener('mouseover', function() {
+            const rating = this.dataset.rating;
+            updateStars(rating);
+        });
+
+        star.addEventListener('mouseout', function() {
+            updateStars(selectedRating);
+        });
+
+        star.addEventListener('click', function() {
+            selectedRating = this.dataset.rating;
+            updateStars(selectedRating);
+        });
+    });
+
+    // تحديث حالة النجوم
+    function updateStars(rating) {
+        ratingStars.forEach(star => {
+            const starRating = star.dataset.rating;
+            if (starRating <= rating) {
+                star.classList.remove('far');
+                star.classList.add('fas');
+            } else {
+                star.classList.remove('fas');
+                star.classList.add('far');
+            }
+        });
+    }
+
+    // إرسال التقييم
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (selectedRating === 0) {
+                alert('Please select a rating');
+                return;
+            }
+
+            const formData = new FormData(this);
+            formData.append('rating', selectedRating);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+    }
+});
 
 	$.fn.elevateZoom.options = {
 			zoomActivation: "hover", // Can also be click (PLACEHOLDER FOR NEXT VERSION)
@@ -2725,7 +2789,21 @@ $(function() {
 
 
 
-
+// JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.getElementById('likeButton');
+    
+    likeButton.addEventListener('click', function() {
+        this.classList.toggle('active');
+        
+ 
+        if (this.classList.contains('active')) {
+            console.log(' add');
+        } else {
+            console.log('delete');
+        }
+    });
+});
 
 
 
