@@ -9,19 +9,19 @@ class Product {
     private string $name;
     private string $description;
     private float $price;
-    private float $discount;
     private int $quantity;
     private string $main_image;
     private ?int $category_id;
     private ?int $subcategory_id;
     private int $status;
     private array $colors = [];
+    private string $created_at;
 
     public function __construct() {
     }
 
     // Create new product
-    public static function create(PDO $db, string $name, string $description, float $price, float $discount, int $quantity, array $main_image, int $category_id, ?int $subcategory_id = null, array $colors = []): ?Product {
+    public static function create(PDO $db, string $name, string $description, float $price, int $quantity, array $main_image, int $category_id, ?int $subcategory_id = null, array $colors = []): ?Product {
         try {
             $db->beginTransaction();
             $main_image = MangesFiles::UploadFile($main_image);
@@ -29,15 +29,14 @@ class Product {
                 return null;
             }
 
-            $query = "INSERT INTO products (name, description, price, discount, quantity, main_image, category_id, subcategory_id) 
-                     VALUES (:name, :description, :price, :discount, :quantity, :main_image, :category_id, :subcategory_id)";
+            $query = "INSERT INTO products (name, description, price, quantity, main_image, category_id, subcategory_id) 
+                     VALUES (:name, :description, :price, :quantity, :main_image, :category_id, :subcategory_id)";
             
             $stmt = $db->prepare($query);
             $stmt->execute([
                 'name' => $name,
                 'description' => $description,
                 'price' => $price,
-                'discount' => $discount,
                 'quantity' => $quantity,
                 'main_image' => $main_image['path'],
                 'category_id' => $category_id,
@@ -49,14 +48,13 @@ class Product {
             $product->name = $name;
             $product->description = $description;
             $product->price = $price;
-            $product->discount = $discount;
             $product->quantity = $quantity;
             $product->main_image = $main_image['path'];
             $product->category_id = $category_id;
             $product->subcategory_id = $subcategory_id;
             $product->status = 1;
+            $product->created_at = date('Y-m-d H:i:s');
 
-            // إضافة الألوان للمنتج
             if (!empty($colors)) {
                 foreach ($colors as $color_id) {
                     $product->addColor($db, $color_id);
@@ -114,12 +112,12 @@ class Product {
                 $product->name = $row['name'];
                 $product->description = $row['description'];
                 $product->price = $row['price'];
-                $product->discount = $row['discount'];
                 $product->quantity = $row['quantity'];
                 $product->main_image = $row['main_image'];
                 $product->category_id = $row['category_id'];
                 $product->subcategory_id = $row['subcategory_id'];
                 $product->status = $row['status'];
+                $product->created_at = $row['created_at'];
                 $product->colors = $product->getColors($db);
                 
                 return $product;
@@ -133,7 +131,7 @@ class Product {
     // Get all products
     public static function getAll(PDO $db): array {
         try {
-            $query = "SELECT * FROM products  WHERE status = 1 ";
+            $query = "SELECT * FROM products WHERE status = 1 ORDER BY created_at DESC";
             $stmt = $db->query($query);
             return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Product');
         } catch (\PDOException $e) {
@@ -141,20 +139,23 @@ class Product {
         }
     }
 
-    public static function get_three_product(PDO $db, int $limit = 3): array {
-    try {
-        $query = "SELECT * FROM products WHERE status = 1 ORDER BY RAND() LIMIT :limit";
-        $stmt = $db->prepare($query);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Product');
-    } catch (\PDOException $e) {
-        return [];
+    public static function getRandomProducts(PDO $db, int $limit = 3): array {
+        try {
+            $query = "SELECT * FROM products 
+                     WHERE status = 1 
+                     ORDER BY RAND() 
+                     LIMIT :limit";
+            $stmt = $db->prepare($query);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Product');
+        } catch (\PDOException $e) {
+            return [];
+        }
     }
-}
-
-    // Update product
-    public function update(PDO $db, string $name, string $description, float $price, float $discount, int $quantity, string $main_image, int $category_id, ?int $subcategory_id = null, array $colors = []): bool {
+  
+    
+    public function update(PDO $db, string $name, string $description, float $price, int $quantity, string $main_image, int $category_id, ?int $subcategory_id = null, array $colors = []): bool {
         try {
             $db->beginTransaction();
 
@@ -162,7 +163,6 @@ class Product {
                      SET name = :name, 
                          description = :description, 
                          price = :price,
-                         discount = :discount,
                          quantity = :quantity, 
                          main_image = :main_image, 
                          category_id = :category_id,
@@ -175,7 +175,6 @@ class Product {
                 'name' => $name,
                 'description' => $description,
                 'price' => $price,
-                'discount' => $discount,
                 'quantity' => $quantity,
                 'main_image' => $main_image,
                 'category_id' => $category_id,
@@ -183,7 +182,6 @@ class Product {
             ]);
 
             if ($result && !empty($colors)) {
-               
                 $this->clearColors($db);
                 foreach ($colors as $color_id) {
                     $this->addColor($db, $color_id);
@@ -203,12 +201,11 @@ class Product {
         try {
             $db->beginTransaction();
 
-            // Delete product images first
+
             $query = "DELETE FROM product_images WHERE product_id = :id";
             $stmt = $db->prepare($query);
             $stmt->execute(['id' => $this->id]);
 
-            // Then delete the product
             $query = "DELETE FROM products WHERE id = :id";
             $stmt = $db->prepare($query);
             $stmt->execute(['id' => $this->id]);
@@ -221,9 +218,46 @@ class Product {
         }
     }
 
-    // Calculate final price after discount
-    public function getFinalPrice(): float {
-        return $this->price - ($this->price * ($this->discount / 100));
+    // Get final price with offer discount
+    public function getFinalPrice(PDO $db): float {
+        try {
+            $query = "SELECT discount_percentage FROM offers 
+                     WHERE product_id = :product_id 
+                     AND status = 1 
+                     AND start_date <= NOW() 
+                     AND end_date >= NOW() 
+                     ORDER BY created_at DESC LIMIT 1";
+            $stmt = $db->prepare($query);
+            $stmt->execute(['product_id' => $this->id]);
+            
+            if ($offer = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                return $this->price - ($this->price * ($offer['discount_percentage'] / 100));
+            }
+            return $this->price;
+        } catch (\PDOException $e) {
+            return $this->price;
+        }
+    }
+
+    // Get discount
+    public function getDiscount(PDO $db): float {
+        try {
+            $query = "SELECT discount_percentage FROM offers 
+                     WHERE product_id = :product_id 
+                     AND status = 1 
+                     AND start_date <= NOW() 
+                     AND end_date >= NOW() 
+                     ORDER BY created_at DESC LIMIT 1";
+            $stmt = $db->prepare($query);
+            $stmt->execute(['product_id' => $this->id]);
+            
+            if ($offer = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                return (float)$offer['discount_percentage'];
+            }
+            return 0.0;
+        } catch (\PDOException $e) {
+            return 0.0;
+        }
     }
 
     // Getters
@@ -235,16 +269,16 @@ class Product {
         return $this->name;
     }
 
+    public function getCreatedAt(): string {
+        return $this->created_at;
+    }
+
     public function getDescription(): string {
         return $this->description;
     }
 
     public function getPrice(): float {
         return $this->price;
-    }
-
-    public function getDiscount(): float {
-        return $this->discount;
     }
 
     public function getQuantity(): int {
@@ -349,4 +383,6 @@ class Product {
     public function getColorsList(): array {
         return $this->colors;
     }
+
+
 }

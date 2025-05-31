@@ -104,9 +104,9 @@ class CartItem {
         }
     }
 
-      public function getTotalPrice(): float {
+      public function getTotalPrice($db): float {
         if ($this->product) {
-            return $this->product->getFinalPrice() * $this->quantity;
+            return $this->product->getFinalPrice($db) * $this->quantity;
         }
         return 0;
     }

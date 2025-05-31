@@ -99,4 +99,29 @@ class Validate
 
         return null;
     }
+    static function validate_order($first_name, $last_name,$company,$country,$address_street,$address_apartment,$city,$state,$phone,$email)
+    {
+        $date =
+            [
+                "first_name" => $first_name,
+                "last_name" => $last_name,
+                "company" => $company,
+                "country" => $country,
+                "address_street" => $address_street,
+                "address_apartment" => $address_apartment,
+                "city" => $city,
+                "state" => $state,
+                "phone" => $phone,
+                "email" => $email
+            ];
+
+        foreach ($date as $key => $value) {
+            if ($error = self::validateRequired($value, $key)) {
+                return $error;
+            }
+        }
+
+        return null;
+    }
+    
 }

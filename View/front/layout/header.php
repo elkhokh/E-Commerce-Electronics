@@ -1,11 +1,3 @@
-<?php 
-use App\Massage;
- use App\Cart;
- if (isset($_SESSION['user']['id'])) {
- $cart=new Cart($_SESSION['user']['id']);
- $cart->load($db);
- }
- ?>
 <!doctype html>
 <html class="no-js" lang="en">
 
@@ -31,6 +23,17 @@ use App\Massage;
     <link rel="stylesheet" href="public/assets/front/css/custom.css">
 
 </head>
+<?php 
+use App\Massage;
+use App\Cart;
+use App\User;
+
+$cart = null;
+if (isset($_SESSION['user']['id'])) {
+    $cart = new Cart($_SESSION['user']['id']);
+    $cart->load($db);
+}
+?>
 
 <body>
 
@@ -55,8 +58,13 @@ use App\Massage;
                         </div>
                         <div class="top_right text-right">
                             <ul>
-                               <li><a href="my-account.html"> My Account </a></li> 
-                               <li><a href="checkout.html"> Checkout </a></li> 
+                               <?php if (isset($_SESSION['user'])): ?>
+                                   <li><a href="index.php?page=my-account">My Account</a></li>
+                               <?php else: ?>
+                                   <li><a href="index.php?page=Login">Login</a></li>
+                                   <li><a href="index.php?page=register">Register</a></li>
+                               <?php endif; ?>
+                               <li><a href="index.php?page=Cart">Cart</a></li> 
                             </ul>
                         </div> 
                         <div class="search_container">
@@ -74,48 +82,46 @@ use App\Massage;
                             </div>
                             <div class="mini_cart_wrapper">
                                 <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
-                                <?php if(isset($cart) && $cart->getItemsCount() > 0): ?>
+                                <?php if($cart && $cart->getItemsCount() > 0): ?>
                                     <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
                                 <?php endif; ?>
                                 <!--mini cart-->
                                 <div class="mini_cart">
-                                 <?php
-                                foreach ($cart->getItems()as  $item) :
-                                ?>
-                                    <div class="cart_item">
-                                       <div class="cart_img">
-                                           <a href="#"><img src="<?=$item->getProduct()->getMainImage()?>" alt=""></a>
-                                       </div>
-                                        <div class="cart_info">
-                                            <a href="#"><?=$item->getProduct()->getName()?></a>
-                                            <p>Qty: <?=$item->getQuantity()?> X <span> <?=$item->getProduct()->getPrice()?> </span></p>   
-                                        </div>
-                                        <div class="cart_remove">
-                                            <a href="index.php?page=Cart_controller&action=remove&id=<?=$item->getProductId()?>"><i class="ion-android-close"></i></a>
-                                        </div>
-                                    </div>
-                                    <?php endforeach;?>
-                                    <div class="mini_cart_table">
-                                        <div class="cart_total">
-                                            <span>Sub total:</span>
-                                            <span class="price">$<?=$cart->getFinalTotal()?></span>
-                                        </div>
-                                        <div class="cart_total mt-10">
-                                            <span>total:</span>
-                                            <span class="price">$<?=$cart->getFinalTotal()?></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="mini_cart_footer">
-                                       <div class="cart_button">
-                                            <a href="index.php?page=Cart">View cart</a>
-                                        </div>
-                                        <div class="cart_button">
-                                            <a href="checkout.html">Checkout</a>
+                                    <?php if($cart && $cart->getItemsCount() > 0): ?>
+                                        <?php foreach ($cart->getItems() as $item): ?>
+                                            <div class="cart_item">
+                                                <div class="cart_img">
+                                                    <a href="#"><img src="<?=$item->getProduct()->getMainImage()?>" alt=""></a>
+                                                </div>
+                                                <div class="cart_info">
+                                                    <a href="#"><?=$item->getProduct()->getName()?></a>
+                                                    <p>Qty: <?=$item->getQuantity()?> X <span> <?=$item->getProduct()->getPrice()?> </span></p>      
+                                                </div>
+                                                <div class="cart_remove">
+                                                    <a href="index.php?page=Cart_controller&action=remove&id=<?=$item->getProductId()?>"><i class="ion-android-close"></i></a>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        <div class="mini_cart_table">
+                                            <div class="cart_total">
+                                                <span>Sub total:</span>
+                                                <span class="price">$<?=$cart->getFinalTotal()?></span>
+                                            </div>
+                                            <div class="cart_total mt-10">
+                                                <span>total:</span>
+                                                <span class="price">$<?=$cart->getFinalTotal()?></span>
+                                            </div>
                                         </div>
 
-                                    </div>
-
+                                        <div class="mini_cart_footer">
+                                            <div class="cart_button">
+                                                <a href="index.php?page=Cart">View cart</a>
+                                            </div>
+                                            <div class="cart_button">
+                                                <a href="checkout.html">Checkout</a>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                                 <!--mini cart end-->
                             </div>
@@ -145,11 +151,7 @@ use App\Massage;
                                     </ul>
                                 </li>
                                 <li class="menu-item-has-children">
-                                    <a href="#">blog</a>
-                                    <ul class="sub-menu">
-                                        <li><a href="blog.html">blog</a></li>
-                                        <li><a href="blog-details.html">blog details</a></li>
-                                    </ul>
+                                    <a href="index.php?page=All_Blogs">blog</a>
                                 </li>
                                 <li class="menu-item-has-children">
                                     <a href="login.html">my account</a>
@@ -185,21 +187,23 @@ use App\Massage;
                     <div class="row align-items-center">
                         <div class="col-lg-6 col-md-6">
                             <div class="support_info">
-                                 <?php use App\User;
-                                 if (isset($_SESSION['user'])): ?>
-                                <p>Email: <a href="mailto:"><?= User::find_by_id($db,$_SESSION['user']['id'])->get_email() ?></a></p>
-                                <?php endif;?>
+                                <?php if (isset($_SESSION['user'])): ?>
+                                    <p>Email: <a href="mailto:"><?= User::find_by_id($db, $_SESSION['user']['id'])->get_email() ?></a></p>
+                                <?php else: ?>
+                                    <p>Welcome, Guest!</p>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6">
                             <div class="top_right text-right">
                                 <ul> 
                                     <?php if (isset($_SESSION['user'])): ?>
-                                   <li><a href="index.php?page=Logout">Logout</a></li>
+                                        <li><a href="index.php?page=Logout">Logout</a></li>
                                     <?php else: ?>
-                                   <li><a href="index.php?page=Login">Login</a></li> 
-                                   <?php endif; ?>
-                                   <li><a href="checkout.html">Checkout</a></li> 
+                                        <li><a href="index.php?page=Login">Login</a></li>
+                                        <li><a href="index.php?page=register">Register</a></li>
+                                    <?php endif; ?>
+                                    <li><a href="index.php?page=Cart">Cart</a></li> 
                                 </ul>
                             </div>   
                         </div>
@@ -232,48 +236,46 @@ use App\Massage;
                                     </div>
                                     <div class="mini_cart_wrapper">
                                         <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
-                                        <?php if(isset($cart) && $cart->getItemsCount() > 0): ?>
+                                        <?php if($cart && $cart->getItemsCount() > 0): ?>
                                             <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
                                         <?php endif; ?>
                                         <!--mini cart-->
-                                         <div class="mini_cart">
-                                             <div class="cart_item">
-                                              <?php
-                                             foreach ($cart->getItems()as  $item) :
-                                              ?>
-                                               <div class="cart_img">
-                                                   <a href="#"><img src="<?=$item->getProduct()->getMainImage()?>" alt=""></a>
-                                               </div>
-                                                <div class="cart_info">
-                                                    <a href="#"><?=$item->getProduct()->getName()?></a>
-                                                    <p>Qty: <?=$item->getQuantity()?> X <span> <?=$item->getProduct()->getPrice()?> </span></p>      
-                                                </div>
-                                                <div class="cart_remove">
-                                                    <a href="index.php?page=Cart_controller&action=remove&id=<?=$item->getProductId()?>"><i class="ion-android-close"></i></a>
-                                                </div>
-                                             <?php endforeach;?>
-                                            </div>
-                                            <div class="mini_cart_table">
-                                                <div class="cart_total">
-                                                    <span>Sub total:</span>
-                                                    <span class="price">$<?=$cart->getFinalTotal()?></span>
-                                                </div>
-                                                <div class="cart_total mt-10">
-                                                    <span>total:</span>
-                                                    <span class="price">$<?=$cart->getFinalTotal()?></span>
-                                                </div>
-                                            </div>
-
-                                            <div class="mini_cart_footer">
-                                               <div class="cart_button">
-                                                    <a href="index.php?page=Cart">View cart</a>
-                                                </div>
-                                                <div class="cart_button">
-                                                    <a href="checkout.html">Checkout</a>
+                                        <div class="mini_cart">
+                                            <?php if($cart && $cart->getItemsCount() > 0): ?>
+                                                <?php foreach ($cart->getItems() as $item): ?>
+                                                    <div class="cart_item">
+                                                        <div class="cart_img">
+                                                            <a href="#"><img src="<?=$item->getProduct()->getMainImage()?>" alt=""></a>
+                                                        </div>
+                                                        <div class="cart_info">
+                                                            <a href="#"><?=$item->getProduct()->getName()?></a>
+                                                            <p>Qty: <?=$item->getQuantity()?> X <span> <?=$item->getProduct()->getPrice()?> </span></p>      
+                                                        </div>
+                                                        <div class="cart_remove">
+                                                            <a href="index.php?page=Cart_controller&action=remove&id=<?=$item->getProductId()?>"><i class="ion-android-close"></i></a>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                                <div class="mini_cart_table">
+                                                    <div class="cart_total">
+                                                        <span>Sub total:</span>
+                                                        <span class="price">$<?=$cart->getFinalTotal()?></span>
+                                                    </div>
+                                                    <div class="cart_total mt-10">
+                                                        <span>total:</span>
+                                                        <span class="price">$<?=$cart->getFinalTotal()?></span>
+                                                    </div>
                                                 </div>
 
-                                            </div>
-
+                                                <div class="mini_cart_footer">
+                                                    <div class="cart_button">
+                                                        <a href="index.php?page=Cart">View cart</a>
+                                                    </div>
+                                                    <div class="cart_button">
+                                                        <a href="index.php?page=checkout">Checkout</a>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
                                         </div>
                                         <!--mini cart end-->
                                     </div>
@@ -310,11 +312,7 @@ use App\Massage;
                                                 <li><a href="checkout.html">checkout</a></li>
                                             </ul>
                                         </li>
-                                        <li><a href="blog.html">blog<i class="fa fa-angle-down"></i></a>
-                                            <ul class="sub_menu pages">
-                                                <li><a href="blog.html">blog</a></li>
-                                                <li><a href="blog-details.html">blog details</a></li>
-                                            </ul>
+                                        <li><a href="index.php?page=All_Blogs">blogs</a>
                                         </li>
                                         <li><a href="contact.html"> Contact Us</a></li>
                                     </ul>  

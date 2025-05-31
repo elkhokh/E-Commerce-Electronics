@@ -6,6 +6,8 @@
           if ( isset($_GET['id'])) {
             $id = $_GET['id'];
             $product = Product::findById($db,$id);
+            // var_dump($product->getDiscount($db));
+            // exit;
         }
 
     
@@ -64,8 +66,8 @@
                                 
                             </div>
                             <div class="price_box">
-                                    <span class="current_price">$<?= $product->getFinalPrice() ?></span>
-                                    <?php if ($product->getDiscount() > 0): ?>
+                                    <span class="current_price">$<?= $product->getFinalPrice($db) ?></span>
+                                    <?php if ($product->getDiscount($db) > 0): ?>
                                         <span class="old_price">$<?= $product->getPrice() ?></span>
                                     <?php endif; ?>
                                 
@@ -103,8 +105,7 @@
                             </div>
                             <div class=" product_d_action">
                                <ul>
-                                   <li><a href="#" title="Add to wishlist">+ Add to Wishlist</a></li>
-                                   <li><a href="#" title="Add to wishlist">+ Compare</a></li>
+                               <li><a href="index.php?page=wishlist_controller&action=add&id=<?= $product->getId() ?>" title="Add to wishlist">+ Add to Wishlist</a></li>
                                </ul>
                             </div>
                             <div class="product_meta">
@@ -160,16 +161,16 @@
                                         <table>
                                             <tbody>
                                                 <tr>
-                                                    <td class="first_child">Compositions</td>
-                                                    <td>Polyester</td>
+                                                    <td class="first_child">SubCategory</td>
+                                                    <td><?=$product->getSubcategory($db)['name']?></td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="first_child">Styles</td>
-                                                    <td>Girly</td>
+                                                    <td class="first_child">Category</td>
+                                                    <td><?=$product->getCategory($db)['name']?></td>
                                                 </tr>
                                                 <tr>
                                                     <td class="first_child">Properties</td>
-                                                    <td>Short Dress</td>
+                                                    <td><?=$product->getDescription()?></td>
                                                 </tr>
                                             </tbody>
                                         </table>
