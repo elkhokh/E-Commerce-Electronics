@@ -32,7 +32,13 @@ use App\User;
                         </div>
                         <div class="row">
                             <?php
-                            $allBlogs = Blogs::getAll($db);
+                            $page_limit=4;
+                            $page_num= $_GET['page_num'] ??1;
+                            $totalBlogs = Blogs::getBlogsCount($db);
+                            $totalPages = ceil($totalBlogs / $page_limit);
+                            $offset=((int)$page_num - 1) * $page_limit;
+
+                            $allBlogs = Blogs::getLatest($db,$page_limit,$offset);
                             if (!empty($allBlogs)):
                                 foreach ($allBlogs as $blog):
                             ?>
@@ -136,12 +142,14 @@ use App\User;
             <div class="row">
                 <div class="col-12">
                     <div class="pagination">
-                        <ul>
-                            <li class="current">1</li>
-                            <li><a href="#">2</a></li>
-                            <li><a href="#">3</a></li>
-                            <li class="next"><a href="#">next</a></li>
-                            <li><a href="#"><i class="fa fa-angle-right"></i></a></li>
+                        <ul> 
+                            <?php
+                            for ($i=1; $i <=$totalPages ; $i++) :
+                            ?>
+                             <li class="page-item <?= $i == $page_num ? 'active' : '' ?> " aria-current="page">
+                                <a class="page-link" href="index.php?page=All_Blogs&page_num=<?= $i ?>"><?= $i ?></a>
+                            </li>
+                            <?php endfor; ?>
                         </ul>
                     </div>
                 </div>

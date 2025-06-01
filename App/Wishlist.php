@@ -71,4 +71,23 @@ class Wishlist {
     public function getCreatedAt(): string {
         return $this->created_at;
     }
+
+    public static function getUserWishlist(PDO $db, int $user_id): array
+    {
+        try {
+            $query = "SELECT p.*, w.created_at as added_date 
+                     FROM wishlist w 
+                     JOIN products p ON w.product_id = p.id 
+                     WHERE w.user_id = :user_id 
+                     ORDER BY w.created_at DESC";
+            
+            $stmt = $db->prepare($query);
+            $stmt->execute(['user_id' => $user_id]);
+            
+            return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\Product');
+        } catch (\PDOException $e) {
+            return [];
+        }
+    }
+
 }

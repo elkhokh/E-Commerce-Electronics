@@ -3,6 +3,7 @@
 namespace App;
 
 use PDO;
+use PDOException;
 
 class User
 {
@@ -125,5 +126,20 @@ class User
             return true;
         }
         return false;
+    }
+
+
+    public static function getRole(PDO $pdo, int $userId): ?string
+    {
+        try {
+            $stmt = $pdo->prepare("SELECT role FROM users WHERE id = :id");
+            $stmt->bindParam(":id", $userId);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return $result ? $result['role'] : null;
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 }
