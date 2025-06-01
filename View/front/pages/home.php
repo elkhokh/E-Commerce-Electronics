@@ -6,7 +6,7 @@ use App\Product;
 use App\User;
 use App\Massage;
 
-//$offers = new Offers();
+
 $isLoggedIn = isset($_SESSION['user']);
 ?>
     <!--slider area start-->
@@ -247,39 +247,25 @@ if ($isLoggedIn) {
                             <article class="single_testimonial">
                                 <figure>
                                     <div class="testimonial_thumb">
-                                        <a href="#"><img src="assets/img/about/team-3.jpg" alt=""></a>
+                                        <a href="#"><img src="Public/assets/front/img/about/mostafa.png" alt="Sarah Johnson"></a>
                                     </div>
                                     <figcaption class="testimonial_content">
-                                        <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45</p>
-                                        <h3><a href="#">Kathy Young</a><span> - CEO of SunPark</span></h3>
+                                        <p>"As a PHP developer, I'm impressed by the quality of their e-commerce platform. The clean code structure and efficient database queries make it a pleasure to work with. Their technical support team is also very knowledgeable and responsive."</p>
+                                        <h3><a href="#">Mustapha Khalid</a><span> -  Developer php</span></h3>
                                     </figcaption>
-                                    
                                 </figure>
-                            </article> 
+                            </article>
                             <article class="single_testimonial">
                                 <figure>
                                     <div class="testimonial_thumb">
-                                        <a href="#"><img src="assets/img/about/team-1.jpg" alt=""></a>
+                                        <a href="#"><img src="Public\assets\front\img\about\osama.jpg.png" alt="Michael Chen"></a>
                                     </div>
                                     <figcaption class="testimonial_content">
-                                        <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even</p>
-                                        <h3><a href="#">John Sullivan</a><span> - Customer</span></h3>
+                                    <p>"As a PHP developer, I'm impressed by the quality of their e-commerce platform. The clean code structure and efficient database queries make it a pleasure to work with. Their technical support team is also very knowledgeable and responsive."</p>
+                                        <h3><a href="#">Osama Elgendy</a><span> - Developer php</span></h3>
                                     </figcaption>
-                                    
                                 </figure>
-                            </article> 
-                            <article class="single_testimonial">
-                                <figure>
-                                    <div class="testimonial_thumb">
-                                        <a href="#"><img src="assets/img/about/team-2.jpg" alt=""></a>
-                                    </div>
-                                    <figcaption class="testimonial_content">
-                                        <p>College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites</p>
-                                        <h3><a href="#">Jenifer Brown</a><span> - Manager of AZ</span></h3>
-                                    </figcaption>
-                                    
-                                </figure>
-                            </article>      
+                            </article>  
                         </div>   
                     </div>
                 </div>

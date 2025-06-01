@@ -67,7 +67,7 @@ class Order {
         }
     }
 
-    // الحصول على تفاصيل الطلب
+
     public static function findById(PDO $db, int $id): ?Order {
         try {
             $query = "SELECT * FROM orders WHERE id = :id";
@@ -93,7 +93,7 @@ class Order {
         }
     }
 
-    // الحصول على جميع طلبات المستخدم
+
     public static function getOrdersByUserId(PDO $db, int $user_id): array {
         try {
             $query = "SELECT * FROM orders WHERE user_id = :user_id ORDER BY created_at DESC";
@@ -119,7 +119,7 @@ class Order {
         }
     }
 
-    // الحصول على منتجات الطلب
+
     public function getItems(PDO $db): array {
         try {
             $query = "SELECT oi.*, p.name, p.main_image 
@@ -134,7 +134,7 @@ class Order {
         }
     }
 
-    // تحديث حالة الطلب
+
     public function updateStatus(PDO $db, string $status): bool {
         try {
             $query = "UPDATE orders SET status = :status WHERE id = :id";

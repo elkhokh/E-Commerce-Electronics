@@ -29,9 +29,23 @@ use App\Cart;
 use App\User;
 
 $cart = null;
-if (isset($_SESSION['user']['id'])) {
-    $cart = new Cart($_SESSION['user']['id']);
-    $cart->load($db);
+$user_email = null;
+
+if (isset($db)) {
+    if (isset($_SESSION['user']['id'])) {
+        $cart = new Cart($_SESSION['user']['id']);
+        $cart->load($db);
+        
+        try {
+            $user = User::find_by_id($db, $_SESSION['user']['id']);
+            $user_email = $user->get_email();
+        } catch (Exception $e) {
+            $user_email = null;
+        }
+    }
+} else {
+    include 'View/Error/Maintenance.php';
+    exit;
 }
 ?>
 
@@ -54,7 +68,11 @@ if (isset($_SESSION['user']['id'])) {
                               <a href="javascript:void(0)"><i class="ion-android-close"></i></a>  
                         </div>
                         <div class="support_info">
-                            <p>Any Enquiry: <a href="tel:">+56985475235</a></p>
+                            <?php if (isset($_SESSION['user']) && $user_email): ?>
+                                <p>Email: <a href="mailto:"><?= $user_email ?></a></p>
+                            <?php else: ?>
+                                <p>Welcome, Guest!</p>
+                            <?php endif; ?>
                         </div>
                         <div class="top_right text-right">
                             <ul>
@@ -68,9 +86,9 @@ if (isset($_SESSION['user']['id'])) {
                             </ul>
                         </div> 
                         <div class="search_container">
-                           <form action="#">
+                           <form action="index.php?page=product_search" method="post">
                                 <div class="search_box">
-                                    <input placeholder="Search product..." type="text">
+                                    <input type="text" name="name" placeholder="Search product..." >
                                     <button type="submit">Search</button> 
                                 </div>
                             </form>
@@ -121,6 +139,8 @@ if (isset($_SESSION['user']['id'])) {
                                                 <a href="checkout.html">Checkout</a>
                                             </div>
                                         </div>
+                                    <?php else: ?>
+                                        <p>Your cart is empty</p>
                                     <?php endif; ?>
                                 </div>
                                 <!--mini cart end-->
@@ -131,39 +151,26 @@ if (isset($_SESSION['user']['id'])) {
                                 <li class="menu-item-has-children active">
                                     <a href="index.php?page=home">Home</a>
                                 </li>
-                                <li class="menu-item-has-children">
-                                    <a href="product-details.html">product</a>
+                                <li><a class="active" href="">page <i class="fa fa-angle-down"></i></a>
+                                    <ul class="sub_menu pages">
+                                        <li><a href="index.php?page=Wishlist"></a></li>
+                                        <li><a href="index.php?page=All_product"></a></li>
+                                   </ul>
                                 </li>
-                                <li class="menu-item-has-children">
-                                    <a href="#">pages </a>
-                                    <ul class="sub-menu">
-                                        <li><a href="about.html">About Us</a></li>
-										<li><a href="contact.html">contact</a></li>
-										<li><a href="privacy-policy.html">privacy policy</a></li>
-										<li><a href="faq.html">Frequently Questions</a></li>
-										<li><a href="login.html">login</a></li>
-										<li><a href="register.html">register</a></li>
-										<li><a href="forget-password.html">Forget Password</a></li>
-										<li><a href="404.html">Error 404</a></li>
-										<li><a href="cart.html">cart</a></li>
-										<li><a href="tracking.html">tracking</a></li>
-										<li><a href="checkout.html">checkout</a></li>
-                                    </ul>
+                                <li><a class="active" href="">Product <i class="fa fa-angle-down"></i></a>
+                                    <ul class="sub_menu pages">
+                                        <li><a href="index.php?page=Wishlist">Wishlist</a></li>
+                                        <li><a href="index.php?page=All_product">All Product</a></li>
+                                   </ul>
                                 </li>
                                 <li class="menu-item-has-children">
                                     <a href="index.php?page=All_Blogs">blog</a>
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="login.html">my account</a>
-                                </li>
-                                <li class="menu-item-has-children">
-                                    <a href="contact.html"> Contact Us</a> 
                                 </li>
                             </ul>
                         </div>
 
                         <div class="Offcanvas_footer">
-                            <span><a href="#"><i class="fa fa-envelope-o"></i> info@drophunt.com</a></span>
+                            <span><a href="#"><i class="fa fa-envelope-o"></i> <?= $user_email ?></a></span>
                             <ul>
                                 <li class="facebook"><a href="#"><i class="fa fa-facebook"></i></a></li>
                                 <li class="twitter"><a href="#"><i class="fa fa-twitter"></i></a></li>
@@ -187,8 +194,8 @@ if (isset($_SESSION['user']['id'])) {
                     <div class="row align-items-center">
                         <div class="col-lg-6 col-md-6">
                             <div class="support_info">
-                                <?php if (isset($_SESSION['user'])): ?>
-                                    <p>Email: <a href="mailto:"><?= User::find_by_id($db, $_SESSION['user']['id'])->get_email() ?></a></p>
+                                <?php if (isset($_SESSION['user']) && $user_email): ?>
+                                    <p>Email: <a href="mailto:"><?= $user_email ?></a></p>
                                 <?php else: ?>
                                     <p>Welcome, Guest!</p>
                                 <?php endif; ?>
@@ -223,12 +230,12 @@ if (isset($_SESSION['user']['id'])) {
                         <div class="col-lg-9 col-md-6">
                             <div class="middel_right">
                                 <div class="search_container">
-                                   <form action="#">
-                                        <div class="search_box">
-                                            <input placeholder="Search product..." type="text">
-                                            <button type="submit">Search</button> 
-                                        </div>
-                                    </form>
+                           <form action="index.php?page=product_search" method="post">
+                                <div class="search_box">
+                                    <input type="text" name="name" placeholder="Search product..." >
+                                    <button type="submit">Search</button> 
+                                </div>
+                            </form>
                                 </div>
                                 <div class="middel_right_info">
                                     <div class="header_wishlist">
@@ -275,6 +282,8 @@ if (isset($_SESSION['user']['id'])) {
                                                         <a href="index.php?page=checkout">Checkout</a>
                                                     </div>
                                                 </div>
+                                            <?php else: ?>
+                                                <p>Your cart is empty</p>
                                             <?php endif; ?>
                                         </div>
                                         <!--mini cart end-->
@@ -295,26 +304,20 @@ if (isset($_SESSION['user']['id'])) {
                                 <nav>  
                                     <ul>
                                         <li><a href="index.php?page=home">home</a></li>
-                                        <li><a href="product-details.html">Product</a></li>
-                                        
-                                        <li><a class="active" href="#">pages <i class="fa fa-angle-down"></i></a>
+                                        <li><a class="active" href="">Page <i class="fa fa-angle-down"></i></a>
                                             <ul class="sub_menu pages">
-                                                <li><a href="about.html">About Us</a></li>
-                                                <li><a href="contact.html">contact</a></li>
-                                                <li><a href="privacy-policy.html">privacy policy</a></li>
-                                                <li><a href="faq.html">Frequently Questions</a></li>
-                                                <li><a href="login.html">login</a></li>
-                                                <li><a href="register.html">register</a></li>
-                                                <li><a href="forget-password.html">Forget Password</a></li>
-                                                <li><a href="404.html">Error 404</a></li>
-                                                <li><a href="cart.html">cart</a></li>
-                                                <li><a href="tracking.html">tracking</a></li>
-                                                <li><a href="checkout.html">checkout</a></li>
+                                                <li><a href="index.php?page=Wishlist"></a></li>
+                                                <li><a href="index.php?page=All_product"></a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a class="active" href="">Product <i class="fa fa-angle-down"></i></a>
+                                            <ul class="sub_menu pages">
+                                                <li><a href="index.php?page=Wishlist">Wishlist</a></li>
+                                                <li><a href="index.php?page=All_product">All Product</a></li>
                                             </ul>
                                         </li>
                                         <li><a href="index.php?page=All_Blogs">blogs</a>
                                         </li>
-                                        <li><a href="contact.html"> Contact Us</a></li>
                                     </ul>  
                                 </nav> 
                             </div>

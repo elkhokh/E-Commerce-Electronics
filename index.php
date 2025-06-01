@@ -6,9 +6,14 @@ require_once "Config/database.php";
 
 // use database
 use App\Database\Database;
+use App\User;
 
 /******************  route system **********************/
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+
+if (isset($_SESSION['user']['id'])) {
+ $user_id =  (int)$_SESSION['user']['id']  ;
+}
 $db = null;
 
 
@@ -19,28 +24,32 @@ if ($page !== 'Maintenance') {
         $page = 'Maintenance'; 
     }
 }
-            // $_SESSION["user"] = [
-            //     "name" => "name",
-            //     "id" => "1"
-            // ];
+
 
 //start from front
 // check if front show all page of front another show all page of dashboard
-$user_type = 1;
+$user_type =  isset($_SESSION['user']['id']) ?  User::getRole($db,$user_id) : 'user';
+// var_dump($user_type);
+// exit;
 
 /****************** dashboard ********************** */
-// if ($user_type) {
-//     include 'View/dashboard/layout/header.php';
-//     $routes = [
-//         'home' => 'View/dashboard/pages/home.php',
-//     ];
-//     $file = isset($rout[$page]) ? $rout[$page] : './view/error/404.php';
-//     include $file;
-//     include 'View/dashboard/layout/footer.php';
-// }
+if ($user_type==='admin') {
+      ob_start();
+    include 'View/dashboard/layout/header.php';
+    include 'View/dashboard/layout/nav.php';
+    include 'View/dashboard/layout/sidebar.php';
+    $routes = [
+        'home' => 'View/dashboard/pages/home.php',
+        'Logout' => 'App/controller/auth/Logout_controller.php',
+    ];
+    $file = isset($routes[$page]) ? $routes[$page] : './view/error/404.php';
+    include $file;
+    include 'View/dashboard/layout/footer.php';
+    ob_end_flush();
+}
 
 /****************** front ********************** */
-if ($user_type) {
+if ($user_type==='user') {
 
   
 
@@ -60,14 +69,18 @@ if ($user_type) {
         'discount_controller' => 'App/controller/Cart/discount_controller.php',
         'Logout' => 'App/controller/auth/Logout_controller.php',
         'change_password' => 'App/controller/auth/change_password_controller.php',
+        'product_controller' => 'App/controller/product/product_controller.php',
         'product_details' => 'View/front/pages/product/product_details.php',
         'All_Blogs' => 'View/front/pages/Blogs/All_Blogs.php',
         'contact_us' => 'View/front/pages/contact_us.php',
         'tracking' => 'View/front/pages/tracking.php',
         'blog_details' => 'View/front/pages/Blogs/blog_details.php',
         'checkout' => 'View/front/pages/checkout.php',
+        'product_search' => 'View/front/pages/product/product_search.php',
         'thank_you' => 'View/front/pages/thank_you.php',
         'all_orders' => 'View/front/pages/all_orders.php',
+        'Wishlist' => 'View/front/pages/product/Wishlist.php',
+        'All_product' => 'View/front/pages/product/All_product.php',
         'Login' => 'View/front/pages/auth/login.php'
     ];
     ob_start(); 

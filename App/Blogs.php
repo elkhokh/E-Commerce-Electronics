@@ -57,21 +57,23 @@ class Blogs {
         }
     }
 
-    public static function getLatest(PDO $db, int $limit = 3): array {
+    public static function getLatest(PDO $db, int $limit = 3,$offset=0): array {
         try {
             $query = "SELECT b.*, u.name as author_name 
                      FROM blogs b 
                      JOIN users u ON b.user_id = u.id 
                      ORDER BY b.created_at DESC 
-                     LIMIT :limit";
+                     LIMIT :limit OFFSET :offset";
             $stmt = $db->prepare($query);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_CLASS, self::class);
         } catch (\PDOException $e) {
             return [];
         }
     }
+  
     public static function getRandomBlogs(PDO $db, int $limit = 3): array {
         try {
             $query = "SELECT b.*, u.name as author_name 
@@ -141,9 +143,7 @@ class Blogs {
         }
     }
 
-    /**
-     * إضافة تعليق جديد على المدونة
-     */
+
     public static function addComment(PDO $db, int $blog_id, int $user_id, string $comment): bool {
         try {
             $query = "INSERT INTO blog_comments (blog_id, user_id, comment) 
@@ -159,12 +159,10 @@ class Blogs {
         }
     }
 
-    /**
-     * حذف تعليق من المدونة
-     */
+
     public static function deleteComment(PDO $db, int $comment_id, int $user_id): bool {
         try {
-            // التحقق من أن المستخدم هو صاحب التعليق
+
             $query = "DELETE FROM blog_comments 
                      WHERE id = :comment_id AND user_id = :user_id";
             $stmt = $db->prepare($query);
@@ -177,9 +175,7 @@ class Blogs {
         }
     }
 
-    /**
-     * الحصول على تعليق محدد
-     */
+
     public static function getComment(PDO $db, int $comment_id): ?array {
         try {
             $query = "SELECT bc.*, u.name as author_name 
@@ -194,28 +190,9 @@ class Blogs {
         }
     }
 
-    /**
-     * تحديث تعليق
-     */
-    public static function updateComment(PDO $db, int $comment_id, int $user_id, string $comment): bool {
-        try {
-            $query = "UPDATE blog_comments 
-                     SET comment = :comment 
-                     WHERE id = :comment_id AND user_id = :user_id";
-            $stmt = $db->prepare($query);
-            return $stmt->execute([
-                'comment_id' => $comment_id,
-                'user_id' => $user_id,
-                'comment' => $comment
-            ]);
-        } catch (\PDOException $e) {
-            return false;
-        }
-    }
+ 
 
-    /**
-     * الحصول على جميع التعليقات لمدونة معينة مع معلومات المستخدم
-     */
+
     public static function getAllComments(PDO $db, int $blog_id): array {
         try {
             $query = "SELECT bc.*, u.name as author_name, u.image as author_image 
@@ -268,4 +245,18 @@ class Blogs {
     public function setImage(string $image): void {
         $this->image = $image;
     }
+    public static function getBlogsCount(PDO $db): int
+    {
+        try {
+            $query = "SELECT COUNT(*) FROM blogs";
+            $stmt = $db->prepare($query);
+            $stmt->execute();
+            return (int) $stmt->fetchColumn();
+        } catch (\PDOException $e) {
+            return 0;
+        }
+    }
+
+
+  
 }

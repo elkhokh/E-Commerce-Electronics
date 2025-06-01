@@ -385,4 +385,24 @@ class Product {
     }
 
 
+    public static function find_by_name(PDO $db, string $name): array
+    {
+        try {
+            $query = "SELECT * FROM products 
+                     WHERE status = 1 
+                     AND name LIKE :name 
+                     ORDER BY created_at DESC";
+            
+            $stmt = $db->prepare($query);
+            $searchTerm = "%{$name}%";
+            $stmt->bindParam(':name', $searchTerm);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Product');
+        } catch (\PDOException $e) {
+            return [];
+        }
+    }
+
+  
 }
