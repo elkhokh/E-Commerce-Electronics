@@ -1,5 +1,5 @@
 <?php
-// Example: Fetch wishlist products for the logged-in user
+
 use App\Product;
 use App\Wishlist;
 
@@ -10,7 +10,7 @@ if (!$user_id) {
     exit;
 }
 
-// Get wishlist products (replace with your actual logic)
+
 $wishlistProducts = Wishlist::getUserWishlist($db, $user_id);
 ?>
 

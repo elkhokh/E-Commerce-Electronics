@@ -7,29 +7,29 @@ trait MangesFiles
      $filename=$file['name'];
      $Extension=pathinfo($filename,PATHINFO_EXTENSION);
      if(!in_array($Extension,$AllowedExtension)){
-        return ['error'=>'Invalid file extension'];
+        return ['error'=>'Invalid file extension OR Is empty'];
      }
 
-     // Generate unique filename
+
      $newFilename = uniqid() . '.' . $Extension;
      
-     // Set default upload folder if not provided
-     $uploadFolder = $uploadFolder ?? 'uploads';
+
+     $uploadFolder = $uploadFolder ?? 'Public/front/img/upload';
      
-     // Create upload directory if it doesn't exist
+
      if (!file_exists($uploadFolder)) {
          mkdir($uploadFolder, 0777, true);
      }
      
-     // Set full path for the file
+
      $uploadPath = $uploadFolder . '/' . $newFilename;
      
-     // Check if file was successfully uploaded
+
      if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
          return [
              'success' => true,
              'filename' => $newFilename,
-             'path' => $uploadPath
+             'path' =>  $uploadPath
          ];
      }
      

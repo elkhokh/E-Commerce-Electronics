@@ -2,6 +2,7 @@
 
 use App\Blogs;
 use App\User;
+use App\Comment_replies;
 $user_id = (int)$_SESSION['user']['id'];
 ?>
 	<!--blog body area start-->
@@ -56,35 +57,79 @@ $user_id = (int)$_SESSION['user']['id'];
                             </figure>
                         </article>
                         <div class="comments_box">
-                            <h3><?= $blog->getCommentCount($db) ?> Comments	</h3>
-                            <?php
-                            foreach ($blog->getComments($db) as  $comment) :
-                                // var_dump($comment['id']);
+                            <h3><?= $blog->getCommentCount($db) ?> Comments</h3>
+                            <?php foreach ($blog->getComments($db) as $comment) :
+                                $profile_image = User::get_profile_image($db, $comment['user_id']);
                             ?>
-                            <div class="comment_list">
+                            <div class="reviews_comment_box">
                                 <div class="comment_thumb">
-                                    <img src="assets/img/blog/comment3.png.jpg" alt="">
+                                    <img src="<?=$profile_image?>" alt="" class="rounded-circle">
                                 </div>
-                                <div class="comment_content">
-                                    <div class="comment_meta">
-                                        <h5><a href="#"><?= User::find_by_id($db,$comment['user_id'])->get_name() ?></a></h5>
-                                        <span><?= date('F j, Y', strtotime($comment['created_at']))?></span> 
-                                    </div>
-                                    <p><?= $comment['comment'] ?></p>
-                                    <div class="comment_reply">
-                                    <?php if ($user_id==$comment['user_id']) :
-                                     ?>
-                                       <form action="index.php?page=Comment_controller&action=remove" method="post">
-                                        <input type="hidden" value="<?= $blog->getId() ?>" name="blog_id">
-                                        <input type="hidden" value="<?= $comment['id']?>" name="comment_id">
-                                       <button class="button" type="submit" style="background-color: #000; color: #fff;">Delete</button>
-                                      </form>  
-                                    <?php endif; ?>
+                                <div class="comment_text">
+                                    <div class="reviews_meta">
+                                        <div class="comment_meta">
+                                            <h5><a href="#"><?= User::find_by_id($db,$comment['user_id'])->get_name() ?></a></h5>
+                                            <span><?= date('F j, Y', strtotime($comment['created_at']))?></span> 
+                                        </div>
+                                        <p><?= $comment['comment'] ?></p>
+                                        <?php if ($user_id == $comment['user_id']): ?>
+                                        <div class="comment_actions">
+                                            <form action="index.php?page=Comment_controller&action=remove" method="post" style="display: inline;">
+                                                <input type="hidden" name="blog_id" value="<?= $blog->getId() ?>">
+                                                <input type="hidden" name="comment_id" value="<?= $comment['id'] ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <?php endif; ?>
+                                        <div class="comment_reply_section">
+                                            <div class="reply_button">
+                                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#replyForm<?= $comment['id'] ?>" aria-expanded="false">
+                                                    <i class="fa fa-reply"></i> Reply
+                                                </button>
+                                            </div>
+                                            <div class="collapse reply_form" id="replyForm<?= $comment['id'] ?>">
+                                                <div class="card card-body">
+                                                    <form action="index.php?page=Comment_controller&action=reply" method="post">
+                                                        <input type="hidden" name="blog_id" value="<?= $blog->getId() ?>">
+                                                        <input type="hidden" name="parent_comment_id" value="<?= $comment['id'] ?>">
+                                                        <div class="form-group">
+                                                            <label for="reply_comment<?= $comment['id'] ?>">Your Reply</label>
+                                                            <textarea class="form-control" name="comment" id="reply_comment<?= $comment['id'] ?>" rows="3" required></textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary">Submit Reply</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
                             </div>
-                            <?php endforeach; ?>
+                            <?php
+                                // عرض الردود على التعليق الحالي
+                                foreach (Comment_replies::getRepliesForComment($db, $comment['id']) as $reply): 
+                                    $reply_user = User::find_by_id($db, $reply->getUserId());
+                                    $reply_profile_image = User::get_profile_image($db, $reply->getUserId());
+                            ?>
+                            <div class="comment_list list_two">
+                                <div class="reviews_comment_box">
+                                    <div class="comment_thumb">
+                                        <img src="<?= $reply_profile_image ?>" alt="" class="rounded-circle">
+                                    </div>
+                                    <div class="comment_text">
+                                        <div class="reviews_meta">
+                                            <div class="comment_meta">
+                                                <h5><a href="#"><?= $reply_user->get_name() ?></a></h5>
+                                                <span><?= date('F j, Y', strtotime($reply->getCreatedAt())) ?></span> 
+                                            </div>
+                                            <p><?= $reply->getReply() ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; // نهاية حلقة الردود ?>
+                            <?php endforeach; // نهاية حلقة التعليقات ?>
                         </div>
                         <div class="comments_form">
                             <h3>Leave a Comment </h3>
@@ -158,3 +203,52 @@ $user_id = (int)$_SESSION['user']['id'];
         </div>
     </div>
     <!--blog section area end-->
+
+<style>
+    .comment_list {
+        margin-left: 50px;
+        margin-top: 15px;
+        border-left: 2px solid #e9ecef;
+        padding-left: 20px;
+    }
+    
+    .comment_thumb img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #007bff;
+    }
+    
+    .reviews_comment_box {
+        margin-bottom: 20px;
+    }
+    
+    .comment_meta {
+        margin-bottom: 10px;
+    }
+    
+    .comment_meta h5 {
+        margin: 0;
+        font-size: 14px;
+    }
+    
+    .comment_meta span {
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .comment_actions {
+        margin-top: 10px;
+    }
+    
+    .comment_actions .btn-danger {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    
+    .comment_actions .btn-danger:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+</style>

@@ -13,6 +13,7 @@ class User
     private string $password;
     private string $role;
 
+
     function __construct(int $id, string $name, string $email, string $password, string $role = "user")
     {
         $this->id = $id;
@@ -128,6 +129,30 @@ class User
         return false;
     }
 
+    static function update_profile_image(PDO $db, int $user_id, string $new_image_path): bool
+    {
+        try {
+            $stmt = $db->prepare("UPDATE users SET profile_image = :profile_image WHERE id = :id");
+            $stmt->bindParam(":profile_image", $new_image_path);
+            $stmt->bindParam(":id", $user_id);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    static function get_profile_image(PDO $db, int $user_id): ?string
+    {
+        try {
+            $stmt = $db->prepare("SELECT profile_image FROM users WHERE id = :id");
+            $stmt->bindParam(":id", $user_id);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return $result ? $result['profile_image'] : null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
 
     public static function getRole(PDO $pdo, int $userId): ?string
     {

@@ -108,7 +108,7 @@ $hasItems = $cart && $cart->getItemsCount() > 0;
                     </div>
                     <!--coupon code area end-->
                 <?php else: ?>
-                    <p>Your cart is empty.</p>
+                    <div class="alert alert-info">Your cart is empty .</div>
                 <?php endif; ?>
             </div>
         </div>

@@ -8,7 +8,8 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') DEFAULT 'user',
     status TINYINT(1) DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_image VARCHAR(255) DEFAULT 'Public/assets/front/img/users/default_user.png' AFTER email
 );
 
 
@@ -212,7 +213,6 @@ INSERT INTO reviews (user_id, product_id, rating, comment) VALUES
 (2, 1, 5, 'Excellent quality and performance.');
 
 
-
 CREATE TABLE blogs (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -233,6 +233,7 @@ CREATE TABLE blog_comments (
     FOREIGN KEY (blog_id) REFERENCES blogs(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
 
 
 
