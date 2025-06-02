@@ -144,12 +144,19 @@ use App\User;
                     <div class="pagination">
                         <ul> 
                             <?php
+                            $next=$page_num+1;
                             for ($i=1; $i <=$totalPages ; $i++) :
                             ?>
-                             <li class="page-item <?= $i == $page_num ? 'active' : '' ?> " aria-current="page">
-                                <a class="page-link" href="index.php?page=All_Blogs&page_num=<?= $i ?>"><?= $i ?></a>
+                             <li class=" <?= $i == $page_num ? 'current' : '' ?> " >
+                                <a class="" href="index.php?page=All_Blogs&page_num=<?= $i ?>"><?= $i ?></a>
                             </li>
                             <?php endfor; ?>
+                            <?php if ($totalBlogs<$next) :?>
+                            <li class="next"><a href="index.php?page=All_Blogs&page_num=<?= $next ?>">next</a></li>
+                            <?php else :?>
+                            <li class="next"><a>next</a></li>
+                            <?php endif;?>
+                            <li><a ><i class="fa fa-angle-right"></i></a></li>
                         </ul>
                     </div>
                 </div>

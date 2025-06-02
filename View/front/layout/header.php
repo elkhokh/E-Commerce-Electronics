@@ -28,6 +28,7 @@ use App\Massage;
 use App\Cart;
 use App\User;
 
+
 $cart = null;
 $user_email = null;
 
@@ -82,7 +83,17 @@ if (isset($db)) {
                                    <li><a href="index.php?page=Login">Login</a></li>
                                    <li><a href="index.php?page=register">Register</a></li>
                                <?php endif; ?>
-                               <li><a href="index.php?page=Cart">Cart</a></li> 
+                               <li>
+                                   <a href="index.php?page=my_account">
+                                   <?php if(isset($_SESSION['user'])): ?>
+                                       <div class="user-mini-profile">
+                                           <?php 
+                                           $profile_image =$_SESSION['user'] ? User::get_profile_image($db, $_SESSION['user']['id']) : 'Public/assets/front/img/users/default_user.png';
+                                           ?>
+                                           <img src="<?php echo $profile_image; ?>" alt="User Profile" class="user-mini-avatar">
+                                       </div></a>
+                                   <?php endif; ?>
+                               </li> 
                             </ul>
                         </div> 
                         <div class="search_container">
@@ -96,10 +107,10 @@ if (isset($db)) {
                         
                         <div class="middel_right_info">
                             <div class="header_wishlist">
-                                <a href="wishlist.html"><img src="public/assets/front/img/user.png" alt=""></a>
+                                <a href="index.php?page=Wishlist"><img src="public/assets/front/img/user.png" alt=""></a>
                             </div>
                             <div class="mini_cart_wrapper">
-                                <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
+                                <a href="index.php?page=Cart"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
                                 <?php if($cart && $cart->getItemsCount() > 0): ?>
                                     <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
                                 <?php endif; ?>
@@ -140,7 +151,7 @@ if (isset($db)) {
                                             </div>
                                         </div>
                                     <?php else: ?>
-                                        <p>Your cart is empty</p>
+                                        <div class="alert alert-info">Your cart is empty .</div>
                                     <?php endif; ?>
                                 </div>
                                 <!--mini cart end-->
@@ -153,13 +164,13 @@ if (isset($db)) {
                                 </li>
                                 <li><a class="active" href="">page <i class="fa fa-angle-down"></i></a>
                                     <ul class="sub_menu pages">
-                                        <li><a href="index.php?page=Wishlist"></a></li>
-                                        <li><a href="index.php?page=All_product"></a></li>
+                                       <li><a href="index.php?page=about">About Us</a></li>
+                                       <li><a href="index.php?page=frequently">Frequently Questions</a></li>
+                                       <li><a href="index.php?page=privacy_policy">Privacy Policy</a></li>
                                    </ul>
                                 </li>
                                 <li><a class="active" href="">Product <i class="fa fa-angle-down"></i></a>
                                     <ul class="sub_menu pages">
-                                        <li><a href="index.php?page=Wishlist">Wishlist</a></li>
                                         <li><a href="index.php?page=All_product">All Product</a></li>
                                    </ul>
                                 </li>
@@ -210,7 +221,17 @@ if (isset($db)) {
                                         <li><a href="index.php?page=Login">Login</a></li>
                                         <li><a href="index.php?page=register">Register</a></li>
                                     <?php endif; ?>
-                                    <li><a href="index.php?page=Cart">Cart</a></li> 
+                                    <li>
+                                        <a href="index.php?page=my_account">
+                                   <?php if(isset($_SESSION['user'])): ?>
+                                       <div class="user-mini-profile">
+                                           <?php 
+                                           $profile_image =$_SESSION['user'] ? User::get_profile_image($db, $_SESSION['user']['id']) : 'Public/assets/front/img/users/default_user.png';
+                                           ?>
+                                           <img src="<?php echo $profile_image; ?>" alt="User Profile" class="user-mini-avatar">
+                                       </div>
+                                   <?php endif; ?>
+                                    </a></li> 
                                 </ul>
                             </div>   
                         </div>
@@ -239,10 +260,10 @@ if (isset($db)) {
                                 </div>
                                 <div class="middel_right_info">
                                     <div class="header_wishlist">
-                                        <a href="#"><img src="public/assets/front/img/user.png" alt=""></a>
+                                        <a href="index.php?page=Wishlist"><img src="public/assets/front/img/user.png" alt=""></a>
                                     </div>
                                     <div class="mini_cart_wrapper">
-                                        <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
+                                        <a href="index.php?page=Cart"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
                                         <?php if($cart && $cart->getItemsCount() > 0): ?>
                                             <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
                                         <?php endif; ?>
@@ -283,7 +304,7 @@ if (isset($db)) {
                                                     </div>
                                                 </div>
                                             <?php else: ?>
-                                                <p>Your cart is empty</p>
+                                                <div class="alert alert-info">Your cart is empty .</div>
                                             <?php endif; ?>
                                         </div>
                                         <!--mini cart end-->
@@ -306,13 +327,13 @@ if (isset($db)) {
                                         <li><a href="index.php?page=home">home</a></li>
                                         <li><a class="active" href="">Page <i class="fa fa-angle-down"></i></a>
                                             <ul class="sub_menu pages">
-                                                <li><a href="index.php?page=Wishlist"></a></li>
-                                                <li><a href="index.php?page=All_product"></a></li>
+                                                <li><a href="index.php?page=about">About Us</a></li>
+                                                <li><a href="index.php?page=frequently">Frequently Questions</a></li>
+                                                <li><a href="index.php?page=privacy_policy">Privacy Policy</a></li>
                                             </ul>
                                         </li>
                                         <li><a class="active" href="">Product <i class="fa fa-angle-down"></i></a>
                                             <ul class="sub_menu pages">
-                                                <li><a href="index.php?page=Wishlist">Wishlist</a></li>
                                                 <li><a href="index.php?page=All_product">All Product</a></li>
                                             </ul>
                                         </li>
@@ -331,3 +352,20 @@ if (isset($db)) {
     <?php
     Massage::show_Massages();
     ?>
+
+<style>
+    .user-mini-profile {
+        display: inline-block;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+    
+    .user-mini-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #007bff;
+        vertical-align: middle;
+    }
+</style>
