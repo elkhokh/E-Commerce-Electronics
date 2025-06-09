@@ -47,6 +47,7 @@
                                     </div>
                                     <a href="index.php?page=forget_password">Forget Password?</a>
                                     <a href="index.php?page=register">Not Account Yet?</a>
+                                    <input type="hidden" name="role" value="user">
                                 </form>
                             </div>
                         </div>

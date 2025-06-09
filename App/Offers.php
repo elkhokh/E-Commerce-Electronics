@@ -3,6 +3,7 @@
 namespace App;
 
 use PDO;
+use PDOException;
 
 class Offers {
     private int $id;
@@ -43,9 +44,14 @@ class Offers {
             $offer->start_date = $start_date;
             $offer->end_date = $end_date;
             $offer->status = 1;
+            $offer->created_at = date('Y-m-d H:i:s');
 
             return $offer;
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return null;
         }
     }
@@ -71,7 +77,11 @@ class Offers {
                 return $offer;
             }
             return null;
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return null;
         }
     }
@@ -101,15 +111,30 @@ class Offers {
                 $offers[] = $offer;
             }
             return $offers;
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }
 
-    public static function getAll(PDO $db): array {
+    public static function getAll(PDO $db, int $limit = 0, int $offset = 0): array {
         try {
-            $query = "SELECT * FROM offers ORDER BY created_at DESC";
+            $query = "SELECT * FROM offers ORDER BY created_at ASC";
+            
+            if ($limit > 0) {
+                $query .= " LIMIT :limit OFFSET :offset";
+            }
+            
             $stmt = $db->prepare($query);
+            
+            if ($limit > 0) {
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            }
+            
             $stmt->execute();
             
             $offers = [];
@@ -127,8 +152,29 @@ class Offers {
                 $offers[] = $offer;
             }
             return $offers;
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
+        }
+    }
+
+    public static function getCount(PDO $db): int {
+        try {
+            $query = "SELECT COUNT(*) as total FROM offers";
+            $stmt = $db->prepare($query);
+            $stmt->execute();
+            
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int) $result['total'];
+        } catch(PDOException $ex) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return 0;
         }
     }
 

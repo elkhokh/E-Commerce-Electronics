@@ -7,13 +7,19 @@ use App\Validate;
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
    $email=htmlspecialchars( trim($_POST['email']));
    $password=htmlspecialchars(trim($_POST['password'])) ;
+   $role=$_POST['role'];
 
 
     $error = Validate::validate_Login( $email,$password);
     if (!empty($error)) {
         Massage::set_Massages("danger", $error);
-        header('Location:./index.php?page=Login');
-        exit;
+        if ($role==='user') {
+        header('Location:./index.php?page=Login'); 
+        exit;   
+        }
+        header('Location:./index.php?page=admin'); 
+        exit; 
+        
     }
 
 
@@ -22,9 +28,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         header('Location:./index.php?page=home ');
         exit;
     } else {
+
         Massage::set_Massages("danger", "invalid Email or Password ");
-        header('Location:./index.php?page=Login ');
-        exit;
+        if ($role==='user') {
+        header('Location:./index.php?page=Login'); 
+        exit;   
+        }
+        header('Location:./index.php?page=admin'); 
+        exit; 
+        
     }
+        
+      
 
 }

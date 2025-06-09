@@ -31,8 +31,12 @@ class Comment_controller {
                 self::addComment($db,$user_id);
                break;
             case 'remove':
-                self::deleteComment($db,$user_id);
+                self::deleteComment($db);
                 break;
+                 default:
+                Massage::set_Massages("danger", "Invalid action");
+                header("Location: index.php?page=blogs");
+                exit;
        }
     }
 
@@ -61,7 +65,7 @@ class Comment_controller {
     }
 
 
-   static public function deleteComment($db,$user_id): void {
+   static public function deleteComment($db): void {
 
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -75,7 +79,7 @@ class Comment_controller {
                 exit;
             }
 
-            if (Blogs::deleteComment($db, $comment_id, $user_id)) {
+            if (Blogs::deleteComment($db, $comment_id)) {
                 Massage::set_Massages("success","Comment deleted successfully" );
             } else {
                 Massage::set_Massages("danger","Failed to delete comment" );
