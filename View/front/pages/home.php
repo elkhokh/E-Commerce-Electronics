@@ -59,7 +59,7 @@ $isLoggedIn = isset($_SESSION['user']);
                     <div class="single-tranding">
                         <a href="index.php?page=product_details&id=<?= $product->getId() ?>">
                             <div class="tranding-pro-img">
-                                <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>">
+                                <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>" style="width: 100%; height: 300px; object-fit: cover;">
                             </div>
                             <div class="tranding-pro-title">
                                 <h3><?= $product->getName() ?></h3>
@@ -82,7 +82,7 @@ $isLoggedIn = isset($_SESSION['user']);
                             <div class="product-colors">
                                 <?php foreach ($product->getColors($db) as $color): ?>
                                     <span class="color-option" 
-                                          style="background-color: <?= $color['hex_code'] ?>" 
+                                          style="background-color: <?= $color['code'] ?>" 
                                           title="<?= $color['name'] ?>">
                                     </span>
                                 <?php endforeach; ?>
@@ -201,7 +201,7 @@ if ($isLoggedIn) {
                         <div class="single-tranding">
                             <a href="index.php?page=product_details&id=<?= $product->getId() ?>">
                                 <div class="tranding-pro-img">
-                                    <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>">
+                                    <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>" style="width: 100%; height: 300px; object-fit: cover;">
                                 </div>
                                 <div class="tranding-pro-title">
                                     <h3><?= $product->getName() ?></h3>
@@ -376,6 +376,7 @@ if ($isLoggedIn) {
         </div>
     </section>
     <!--shipping area end-->
+    
 	
 
 	

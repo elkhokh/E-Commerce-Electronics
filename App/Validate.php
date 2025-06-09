@@ -123,5 +123,22 @@ class Validate
 
         return null;
     }
+    static function validate_massage($name, $email,$message)
+    {
+        $date =
+            [
+                "name" => $name,
+                "email" => $email,
+                "message" => $message
+            ];
+
+        foreach ($date as $key => $value) {
+            if ($error = self::validateRequired($value, $key)) {
+                return $error;
+            }
+        }
+
+        return null;
+    }
     
 }

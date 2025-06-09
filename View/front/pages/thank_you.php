@@ -1,5 +1,6 @@
 <?php
 use App\Order;
+use App\Product;
 if (!isset($_GET['id'])) {
     header('Location: index.php?page=checkout');
     exit;
@@ -12,6 +13,8 @@ if (!$order || $order->getUserId() !== $_SESSION['user']['id']) {
     header('Location: index.php?page=checkout');
     exit;
 }
+
+$order_items = $order->getItems($db);
 ?>
 
 <div class="container py-5">
@@ -27,25 +30,26 @@ if (!$order || $order->getUserId() !== $_SESSION['user']['id']) {
             <!-- Order details -->
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Order Details #<?php echo $order->getId(); ?></h5>
+                    <h5 class="mb-0">Order Details #<?= $order->getId(); ?></h5>
                 </div>
                 <div class="card-body">
                     <!-- Order information -->
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <h6 class="text-muted">Order Information</h6>
-                            <p><strong>Order Number:</strong> #<?php echo $order->getId(); ?></p>
-                            <p><strong>Order Date:</strong> <?php echo date('Y-m-d', strtotime($order->getCreatedAt())); ?></p>
+                            <p><strong>Order Number:</strong> #<?= $order->getId(); ?></p>
+                            <p><strong>Order Date:</strong> <?= date('Y-m-d', strtotime($order->getCreatedAt())); ?></p>
                             <p><strong>Order Status:</strong> 
-                                <span class="badge bg-<?php echo $order->getStatus() === 'pending' ? 'warning' : 'success'; ?>">
-                                    <?php echo $order->getStatus() === 'pending' ? 'Pending' : 'Completed'; ?>
+                                <span class="badge bg-<?= $order->getStatus() === 'pending' ? 'warning' : 'success'; ?>">
+                                    <?= ucfirst($order->getStatus()); ?>
                                 </span>
                             </p>
                         </div>
                         <div class="col-md-6">
                             <h6 class="text-muted">Shipping Information</h6>
-                            <p><strong>Shipping Address:</strong> <?php echo $order->getShippingAddress(); ?></p>
-                            <p><strong>Payment Method:</strong> <?php echo $order->getPaymentMethod(); ?></p>
+                            <p><strong>Shipping Address:</strong> <?= $order->getShippingAddress(); ?></p>
+                            <p><strong>Payment Method:</strong> <?= $order->getPaymentMethod(); ?></p>
+                            <p><strong>Phone:</strong> <?= $order->getPhone(); ?></p>
                         </div>
                     </div>
 
@@ -62,25 +66,29 @@ if (!$order || $order->getUserId() !== $_SESSION['user']['id']) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($order->getItems($db) as $item): ?>
+                                <?php foreach ($order_items as $item):
+                                $product=Product::findById($db,$item->getProductId());
+                                    // var_dump($item->getQuantity());
+                                    // exit; ?>
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="<?php echo $item['main_image']; ?>" alt="<?php echo $item['name']; ?>" 
+                                            <img src="<?= $product->getMainImage(); ?>" 
+                                                 alt="<?= $product->getName(); ?>" 
                                                  class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
-                                            <span class="ms-2"><?php echo $item['name']; ?></span>
+                                            <span class="ms-2"><?= $product->getName(); ?></span>
                                         </div>
                                     </td>
-                                    <td>$<?php echo number_format($item['price'], 2); ?></td>
-                                    <td><?php echo $item['quantity']; ?></td>
-                                    <td>$<?php echo number_format($item['price'] * $item['quantity'], 2); ?></td>
+                                    <td>$<?= number_format($item->getPrice(), 2); ?></td>
+                                    <td><?= $item->getQuantity(); ?></td>
+                                    <td>$<?= number_format($item->getPrice() * $item->getQuantity(), 2); ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
-                                    <td><strong>$<?php echo number_format($order->getTotalAmount(), 2); ?></strong></td>
+                                    <td><strong>$<?= number_format($order->getTotalAmount(), 2); ?></strong></td>
                                 </tr>
                             </tfoot>
                         </table>

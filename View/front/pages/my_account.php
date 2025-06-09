@@ -4,7 +4,7 @@ use App\Massage;
 
 
 if (!isset($_SESSION['user']['id'])) {
-    Massage::set_Massages("warning", "Please login to view your cart");
+    Massage::set_Massages("warning", "Please login to view your account");
     header('Location: index.php?page=Login');
     exit;
 }

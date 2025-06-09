@@ -857,3 +857,57 @@
     
     
 })(jQuery);	
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+	const stars = document.querySelectorAll('.rating-stars li a');
+	const ratingInput = document.getElementById('rating');
+	const formRatingInput = document.getElementById('formRating');
+	
+	stars.forEach(star => {
+		star.addEventListener('click', function(e) {
+			e.preventDefault();
+			const rating = this.getAttribute('data-rating');
+			ratingInput.value = rating;
+			formRatingInput.value = rating;
+			
+			// تحديث مظهر النجوم
+			stars.forEach(s => {
+				const sRating = s.getAttribute('data-rating');
+				if (sRating <= rating) {
+					s.classList.add('active');
+				} else {
+					s.classList.remove('active');
+				}
+			});
+		});
+	});
+
+	document.getElementById('reviewCommentForm').addEventListener('submit', function(e) {
+		const rating = formRatingInput.value;
+		const comment = document.getElementById('review_comment').value;
+		
+		if (rating === '0') {
+			e.preventDefault();
+			alert('Please select a rating');
+			return;
+		}
+		
+		if (!comment.trim()) {
+			e.preventDefault();
+			alert('Please write a review');
+			return;
+		}
+	});
+});

@@ -1,8 +1,10 @@
 <?php
 
 namespace App;
+use App\Traits\MangesFiles;
 
 use PDO;
+use PDOException;
 
 class Blogs {
     private int $id;
@@ -19,6 +21,7 @@ class Blogs {
         try {
             $query = "INSERT INTO blogs (user_id, title, content, image) 
                      VALUES (:user_id, :title, :content, :image)";
+            
             $stmt = $db->prepare($query);
             return $stmt->execute([
                 'user_id' => $user_id,
@@ -26,7 +29,11 @@ class Blogs {
                 'content' => $content,
                 'image' => $image
             ]);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
@@ -38,21 +45,45 @@ class Blogs {
             $stmt->execute(['id' => $id]);
             $blog = $stmt->fetchObject(self::class);
             return $blog ?: null;
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return null;
         }
     }
 
-    public static function getAll(PDO $db): array {
+    public static function getAll(PDO $db, int $limit = 0, int $offset = 0): array {
         try {
             $query = "SELECT b.*, u.name as author_name 
                      FROM blogs b 
                      JOIN users u ON b.user_id = u.id 
-                     ORDER BY b.created_at DESC";
+                     ORDER BY b.created_at ASC";
+            
+            if ($limit > 0) {
+                $query .= " LIMIT :limit";
+                if ($offset > 0) {
+                    $query .= " OFFSET :offset";
+                }
+            }
+
             $stmt = $db->prepare($query);
+            
+            if ($limit > 0) {
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                if ($offset > 0) {
+                    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                }
+            }
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_CLASS, self::class);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }
@@ -69,7 +100,11 @@ class Blogs {
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_CLASS, self::class);
-        } catch (\PDOException $e) {
+        }  catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }
@@ -85,34 +120,27 @@ class Blogs {
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_CLASS, self::class);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }
 
-    public function update(PDO $db): bool {
-        try {
-            $query = "UPDATE blogs 
-                     SET title = :title, content = :content, image = :image 
-                     WHERE id = :id";
-            $stmt = $db->prepare($query);
-            return $stmt->execute([
-                'id' => $this->id,
-                'title' => $this->title,
-                'content' => $this->content,
-                'image' => $this->image
-            ]);
-        } catch (\PDOException $e) {
-            return false;
-        }
-    }
+   
 
     public function delete(PDO $db): bool {
         try {
             $query = "DELETE FROM blogs WHERE id = :id";
             $stmt = $db->prepare($query);
             return $stmt->execute(['id' => $this->id]);
-        } catch (\PDOException $e) {
+        }  catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
@@ -127,7 +155,11 @@ class Blogs {
             $stmt = $db->prepare($query);
             $stmt->execute(['blog_id' => $this->id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }
@@ -138,11 +170,14 @@ class Blogs {
             $stmt = $db->prepare($query);
             $stmt->execute(['blog_id' => $this->id]);
             return (int) $stmt->fetchColumn();
-        } catch (\PDOException $e) {
-            return 0;
+        }catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return false;
         }
     }
-
 
     public static function addComment(PDO $db, int $blog_id, int $user_id, string $comment): bool {
         try {
@@ -154,27 +189,31 @@ class Blogs {
                 'user_id' => $user_id,
                 'comment' => $comment
             ]);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
 
-
-    public static function deleteComment(PDO $db, int $comment_id, int $user_id): bool {
+    public static function deleteComment(PDO $db, int $comment_id): bool {
         try {
-
             $query = "DELETE FROM blog_comments 
-                     WHERE id = :comment_id AND user_id = :user_id";
+                     WHERE id = :comment_id ";
             $stmt = $db->prepare($query);
             return $stmt->execute([
-                'comment_id' => $comment_id,
-                'user_id' => $user_id
+                'comment_id' => $comment_id
             ]);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
-
 
     public static function getComment(PDO $db, int $comment_id): ?array {
         try {
@@ -185,13 +224,14 @@ class Blogs {
             $stmt = $db->prepare($query);
             $stmt->execute(['comment_id' => $comment_id]);
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return null;
         }
     }
-
- 
-
 
     public static function getAllComments(PDO $db, int $blog_id): array {
         try {
@@ -203,11 +243,36 @@ class Blogs {
             $stmt = $db->prepare($query);
             $stmt->execute(['blog_id' => $blog_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }
 
+        public static function find_by_name(PDO $db, string $title): array
+    {
+        try {
+            $query = "SELECT * FROM blogs 
+                     WHERE   title LIKE :name 
+                     ORDER BY created_at DESC";
+            
+            $stmt = $db->prepare($query);
+            $searchTerm = "%{$title}%";
+            $stmt->bindParam(':name', $searchTerm);
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\\Blogs');
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return [];
+        }
+    }
     // Getters
     public function getId(): int {
         return $this->id;
@@ -252,11 +317,38 @@ class Blogs {
             $stmt = $db->prepare($query);
             $stmt->execute();
             return (int) $stmt->fetchColumn();
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return 0;
         }
     }
 
+    public function update(PDO $db): bool {
+        try {
+            $query = "UPDATE blogs SET 
+                      title = :title,
+                      content = :content,
+                      image = :image
+                      WHERE id = :id";
+            
+            $stmt = $db->prepare($query);
+            return $stmt->execute([
+                'title' => $this->title,
+                'content' => $this->content,
+                'image' => $this->image,
+                'id' => $this->id
+            ]);
+        } catch(PDOException $ex) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return false;
+        }
+    }
 
-  
+
 }

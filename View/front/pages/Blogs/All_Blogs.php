@@ -89,7 +89,7 @@ use App\User;
                     <div class="blog_sidebar_widget">
                         <div class="widget_list widget_search">
                             <h3>Search</h3>
-                            <form action="index.php" method="GET">
+                            <form action="index.php?page=blog_search" method="post">
                                 <input type="hidden" name="page" value="blogs">
                                 <input placeholder="Search..." type="text" name="search">
                                 <button type="submit">search</button>

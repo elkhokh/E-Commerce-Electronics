@@ -3,6 +3,7 @@
 namespace App;
 
 use PDO;
+use PDOException;
 
 class Wishlist {
     private int $id;
@@ -18,12 +19,17 @@ class Wishlist {
         try {
             $query = "INSERT INTO wishlist (user_id, product_id) 
                      VALUES (:user_id, :product_id)";
+            
             $stmt = $db->prepare($query);
             return $stmt->execute([
                 'user_id' => $user_id,
                 'product_id' => $product_id
             ]);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
@@ -38,7 +44,11 @@ class Wishlist {
                 'user_id' => $user_id,
                 'product_id' => $product_id
             ]);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
@@ -50,7 +60,11 @@ class Wishlist {
             $query = "DELETE FROM wishlist WHERE user_id = :user_id";
             $stmt = $db->prepare($query);
             return $stmt->execute(['user_id' => $user_id]);
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
@@ -85,7 +99,11 @@ class Wishlist {
             $stmt->execute(['user_id' => $user_id]);
             
             return $stmt->fetchAll(PDO::FETCH_CLASS, 'App\Product');
-        } catch (\PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }

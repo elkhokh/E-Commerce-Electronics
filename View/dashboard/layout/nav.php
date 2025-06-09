@@ -1,3 +1,13 @@
+<?php
+
+use App\User;
+if (isset($_SESSION['user'])) {
+	
+	$user=User::find_by_id($db,$_SESSION['user']['id']);
+}
+
+
+?>
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
 				<!-- Right navbar links -->
 				<ul class="navbar-nav">
@@ -19,17 +29,17 @@
 					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-link p-0 pr-3" data-toggle="dropdown" href="#">
-							<img src="public/assets/dashboard/img/avatar5.png" class='public/assets/dashboard/img-circle elevation-2' width="40" height="40" alt="">
+							<img src="<?=isset($_SESSION['user'])?User::get_profile_image($db,$_SESSION['user']['id']):''?>" class='public/assets/dashboard/img-circle elevation-2' width="40" height="40" alt="">
 						</a>
 						<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-3">
-							<h4 class="h4 mb-0"><strong>Mohit Singh</strong></h4>
-							<div class="mb-3">example@example.com</div>
+							<h4 class="h4 mb-0"><strong><?=$user->get_name()?></strong></h4>
+							<div class="mb-3"><?=$user->get_email()?></div>
 							<div class="dropdown-divider"></div>
 							<a href="#" class="dropdown-item">
 								<i class="fas fa-user-cog mr-2"></i> Settings								
 							</a>
 							<div class="dropdown-divider"></div>
-							<a href="#" class="dropdown-item">
+							<a href="index.php?page=change_password" class="dropdown-item">
 								<i class="fas fa-lock mr-2"></i> Change Password
 							</a>
 							<div class="dropdown-divider"></div>
@@ -40,3 +50,7 @@
 					</li>
 				</ul>
 			</nav>
+	<?php
+	use App\Massage;
+	 Massage::show_Massages();
+    ?>

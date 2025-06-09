@@ -9,6 +9,8 @@ if (!isset($_SESSION['user']['id'])) {
     header('Location: index.php?page=Login');
     exit;
 }
+// var_dump($_SESSION['discount_amount']);
+// exit;
 
 $cart = new Cart($_SESSION['user']['id']);
 $cart->load($db);
@@ -43,7 +45,7 @@ $hasItems = $cart && $cart->getItemsCount() > 0;
                                         <td class="product_name">
                                             <a href="#"><?=$item->getProduct()->getName()?></a>
                                         </td>
-                                        <td class="product-price">$<?=$item->getTotalPrice($db)?></td>
+                                        <td class="product-price">$<?=$item->getProduct()->getFinalPrice($db)?></td>
                                         <td class="product_quantity">
                                             <label>Quantity</label>
                                             <form action="index.php?page=Cart_controller&action=chang" method="post" class="d-flex align-items-center"> 
@@ -71,7 +73,7 @@ $hasItems = $cart && $cart->getItemsCount() > 0;
                             <div class="col-lg-6 col-md-6">
                                 <div class="coupon_code left">
                                     <h3>Coupon</h3>
-                                    <form action="index.php?page=discount_controller" method="post">
+                                    <form action="index.php?page=discount_controller&action=apply_discount" method="post">
                                     <div class="coupon_inner">   
                                         <p>Enter your coupon code if you have one.</p>                                
                                         <input placeholder="Coupon code" name="discount_code" type="text">

@@ -94,15 +94,17 @@
 <!-- JS
 ============================================ -->
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Plugins JS -->
 <script src="public/assets/front/js/plugins.js"></script>
 
 <!-- Main JS -->
 <script src="public/assets/front/js/main.js"></script>
-
-
 
 </body>
 

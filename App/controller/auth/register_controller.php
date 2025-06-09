@@ -15,10 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         Massage::set_Massages("danger", $error);
         header('Location:./index.php?page=register');
         exit;
+    }   
+    if (User::find_by_email($db, $email)) {
+        Massage::set_Massages("danger", "Email already exists");
+        header("Location: index.php?page=create_user");
+        exit;
     }
 
-
-    if (User::create( $db,$name,$email, $password)!==null) {
+    if (User::register( $db,$name,$email, $password)!==null) {
         Massage::set_Massages("success", "Register user successfully");
         header('Location:./index.php?page=home ');
         exit;

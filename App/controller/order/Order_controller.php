@@ -8,6 +8,7 @@ use App\Orderitem;
 use App\Cart;
 use App\Validate;
 use PDO;
+use App\Product;
 
 class Order_controller
 {
@@ -31,6 +32,9 @@ class Order_controller
             case 'cancel':
                 self::cancelOrder($db, $user_id);
                 break;
+            case 'update_status':
+                self::updateStatus($db);
+                break;
        }
     }
     
@@ -49,6 +53,7 @@ class Order_controller
                 $phone = htmlspecialchars(trim($_POST['phone']));
                 $email = htmlspecialchars(trim($_POST['email']));
                 $payment_method = htmlspecialchars(trim($_POST['payment_method']?? 'cash'));
+                $Order_Total=$_POST['Order_Total'];
 
                 $error = Validate::validate_order($first_name, $last_name, $company_name, $country, $address_street, $address_apartment, $city, $state, $phone, $email);
                 if (!empty($error)) {
@@ -66,24 +71,31 @@ class Order_controller
                     exit;
                 }
                 
-                $shipping_address = "$address_street, $address_apartment, $city, $state, $country";
+                $shipping_address = "$address_street, $address_apartment,<br>, $city, $state, $country";
                 
-                $order = Order::create($db, $user_id, $cart->getTotal(), $shipping_address, $payment_method);
+                $order = Order::create($db, $user_id, $Order_Total, $shipping_address, $payment_method ,$phone);
                 
                 if ($order) {
                     foreach ($cart->getItems() as $item) {
+                        $product = Product::findById($db, $item->getProductId());
+                        if ($product) {
+                            $new_quantity = $product->getQuantity() - $item->getQuantity();
+                            $product->updateQuantity($db,$new_quantity);
+                        }
+
                         Orderitem::create(
                             $db,
                             $order->getId(),
                             $item->getProductId(),
                             $item->getQuantity(),
-                            $item->getProduct()->getPrice()
+                            $item->getProduct()->getFinalPrice($db)
                         );
                     }
 
                     $cart->clear($db);
                     if (isset($_SESSION['discount_amount'])) {
                      unset( $_SESSION['discount_amount']);   
+                     unset( $_SESSION['discount_code']);   
                     }
                     
                     Massage::set_Massages("success", "Order created successfully");
@@ -124,6 +136,40 @@ class Order_controller
         }
 
         header('Location: index.php?page=all_orders&id=' . $order_id);
+        exit;
+    }
+    private static function updateStatus(PDO $db)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Massage::set_Massages("error", "Invalid request method");
+            header('Location: index.php?page=orders');
+            exit;
+        }
+
+        $order_id = (int)($_POST['order_id'] ?? 0);
+        $new_status = htmlspecialchars(trim($_POST['status'] ?? ''));
+        $order = Order::findById($db, $order_id);
+
+        if (!$order) {
+            Massage::set_Massages("error", "Order not found");
+            header('Location: index.php?page=orders');
+            exit;
+        }
+
+        $valid_statuses = ['pending', 'processing', 'completed', 'cancelled'];
+        if (!in_array($new_status, $valid_statuses)) {
+            Massage::set_Massages("error", "Invalid status");
+            header('Location: index.php?page=order_detail&id=' . $order_id);
+            exit;
+        }
+
+        if ($order->updateStatus($db, $new_status)) {
+            Massage::set_Massages("success", "Order status updated successfully");
+        } else {
+            Massage::set_Massages("error", "Failed to update order status");
+        }
+
+        header('Location: index.php?page=order_detail&id=' . $order_id);
         exit;
     }
 

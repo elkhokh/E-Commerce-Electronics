@@ -83,11 +83,8 @@ CREATE TABLE order_items (
 
 CREATE TABLE discounts (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(50) UNIQUE NOT NULL,
-    type ENUM('percentage', 'fixed') NOT NULL,
-    value DECIMAL(10,2) NOT NULL,
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    value INT NOT NULL,
     status TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -196,10 +193,10 @@ INSERT INTO products (name, description, price, quantity, main_image, category_i
 ('iPhone 13', 'Latest Apple smartphone with advanced features', 999.99, 50, 'Public\assets\front\img\product\iphone.jpeg', 1, 1),
 ('Samsung Galaxy Tab', 'High-performance Android tablet', 499.99, 30, 'Public\assets\front\img\product\s-l960.webp', 1, 2);
 
-INSERT INTO discounts (code, type, value, start_date, end_date, status) 
+INSERT INTO discounts (code, value, status) 
 VALUES 
-('SUMMER2024', 'percentage', 20.00, now(), '2024-03-31 23:59:59', 1),
-('WELCOME50', 'fixed', 50.00, now(), '2026-03-07 23:59:59', 1);
+('SUMMER2024', 20, 1),
+('WELCOME50', 50, 1);
 
 
 INSERT INTO offers (product_id, title, description, discount_percentage, start_date, end_date, status) VALUES 
@@ -235,7 +232,15 @@ CREATE TABLE blog_comments (
 );
 
 
-
+CREATE TABLE comment_replies (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    comment_id INT NOT NULL,
+    user_id INT NOT NULL,
+    reply TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comment_id) REFERENCES blog_comments(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
 
 INSERT INTO blogs (user_id, title, content, image) VALUES 
@@ -246,6 +251,17 @@ INSERT INTO blog_comments (blog_id, user_id, comment) VALUES
 (1, 2, 'Great article! Very informative.'),
 (1, 1, 'Thanks for sharing these insights.');
 
+INSERT INTO comment_replies (comment_id, user_id, reply) VALUES 
+(1, 1, 'Thank you for your feedback!'),
+(2, 2, 'You\re welcome!');
 
+
+CREATE TABLE contact_messages (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 

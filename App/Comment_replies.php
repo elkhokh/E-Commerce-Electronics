@@ -48,7 +48,7 @@ class Comment_replies
         return $this->created_at;
     }
 
-    // Create new reply
+
     public static function create(PDO $pdo, int $comment_id, int $user_id, string $reply): ?Comment_replies
     {
         try {
@@ -62,12 +62,16 @@ class Comment_replies
                 return new self($id, $comment_id, $user_id, $reply, date('Y-m-d H:i:s'));
             }
             return null;
-        } catch (PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return null;
         }
     }
 
-    // Get all replies for a comment
+
     public static function getRepliesForComment(PDO $pdo, int $comment_id): array
     {
         try {
@@ -86,24 +90,32 @@ class Comment_replies
                 );
             }
             return $replies;
-        } catch (PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return [];
         }
     }
 
-    // Delete a reply
+
     public static function delete(PDO $pdo, int $reply_id): bool
     {
         try {
             $stmt = $pdo->prepare("DELETE FROM comment_replies WHERE id = :id");
             $stmt->bindParam(":id", $reply_id);
             return $stmt->execute();
-        } catch (PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return false;
         }
     }
 
-    // Get reply by ID
+
     public static function findById(PDO $pdo, int $reply_id): ?Comment_replies
     {
         try {
@@ -121,12 +133,16 @@ class Comment_replies
                 );
             }
             return null;
-        } catch (PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return null;
         }
     }
 
-    // Get reply count for a comment
+
     public static function getReplyCount(PDO $pdo, int $comment_id): int
     {
         try {
@@ -134,7 +150,11 @@ class Comment_replies
             $stmt->bindParam(":comment_id", $comment_id);
             $stmt->execute();
             return (int) $stmt->fetchColumn();
-        } catch (PDOException $e) {
+        } catch(PDOException $ex){
+            if(file_exists('Config/log.log')){
+                $error = date('Y-m-d H:i:s') . " - " . $ex->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
             return 0;
         }
     }
