@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS E_Commerce_Electronics;
 USE E_Commerce_Electronics;
  
-CREATE TABLE users (
+CREATE TABLE if not exists users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -12,15 +12,16 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE categories (
+CREATE TABLE if not exists categories (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
+    description TEXT,
     status TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
-CREATE TABLE subcategories (
+CREATE TABLE if not exists subcategories (
     id INT PRIMARY KEY AUTO_INCREMENT,
     category_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -35,6 +36,7 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
+    discount DECIMAL(5,2) DEFAULT 0,
     quantity INT DEFAULT 0,
     main_image VARCHAR(255),
     status TINYINT(1) DEFAULT 1,
@@ -46,7 +48,7 @@ CREATE TABLE products (
 );
 
 
-CREATE TABLE product_images (
+CREATE TABLE if not exists product_images (
     id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT NOT NULL,
     image_name VARCHAR(255) NOT NULL,
@@ -68,7 +70,7 @@ CREATE TABLE orders (
 );
 
 
-CREATE TABLE order_items (
+CREATE TABLE if not exists order_items (
     id INT PRIMARY KEY AUTO_INCREMENT,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -80,7 +82,7 @@ CREATE TABLE order_items (
 );
 
 
-CREATE TABLE discounts (
+CREATE TABLE if not exists discounts (
     id INT PRIMARY KEY AUTO_INCREMENT,
     code VARCHAR(50) UNIQUE NOT NULL,
     type ENUM('percentage', 'fixed') NOT NULL,
@@ -91,8 +93,8 @@ CREATE TABLE discounts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-CREATE TABLE wishlist (
+-- جدول المفضلة
+CREATE TABLE if not exists wishlists (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -103,7 +105,7 @@ CREATE TABLE wishlist (
 );
 
 
-CREATE TABLE carts (
+CREATE TABLE if not exists carts (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -115,7 +117,7 @@ CREATE TABLE carts (
 );
 
 
-CREATE TABLE colors (
+CREATE TABLE if not exists colors (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
     hex_code VARCHAR(7) NOT NULL, 
@@ -123,7 +125,7 @@ CREATE TABLE colors (
 );
 
 
-CREATE TABLE product_colors (
+CREATE TABLE if not exists product_colors (
     id INT PRIMARY KEY AUTO_INCREMENT,
     product_id INT NOT NULL,
     color_id INT NOT NULL,
@@ -131,33 +133,6 @@ CREATE TABLE product_colors (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY (color_id) REFERENCES colors(id) ON DELETE CASCADE,
     UNIQUE KEY unique_product_color (product_id, color_id)
-);
-
-
-CREATE TABLE offers (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    product_id INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    discount_percentage DECIMAL(5,2) NOT NULL,
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
-    status TINYINT(1) DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE reviews (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    comment TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_review (user_id, product_id)
 );
 
 
@@ -181,9 +156,9 @@ INSERT INTO product_colors (product_id, color_id) VALUES
 (2, 5);
 
 -- Insert test data for categories
-INSERT INTO categories (name) VALUES 
-('Electronics'),
-('Computers');
+INSERT INTO categories (name, description) VALUES 
+('Electronics', 'Electronic devices and accessories'),
+('Computers', 'Computers and related equipment');
 
 -- Insert test data for subcategories
 INSERT INTO subcategories (category_id, name, description) VALUES 
@@ -191,60 +166,7 @@ INSERT INTO subcategories (category_id, name, description) VALUES
 (1, 'Tablets', 'Tablets and accessories');
 
 -- Insert test products
-INSERT INTO products (name, description, price, quantity, main_image, category_id, subcategory_id) VALUES 
-('iPhone 13', 'Latest Apple smartphone with advanced features', 999.99, 50, 'Public\assets\front\img\product\iphone.jpeg', 1, 1),
-('Samsung Galaxy Tab', 'High-performance Android tablet', 499.99, 30, 'Public\assets\front\img\product\s-l960.webp', 1, 2);
-
-INSERT INTO discounts (code, type, value, start_date, end_date, status) 
-VALUES 
-('SUMMER2024', 'percentage', 20.00, now(), '2024-03-31 23:59:59', 1),
-('WELCOME50', 'fixed', 50.00, now(), '2026-03-07 23:59:59', 1);
-
-
-INSERT INTO offers (product_id, title, description, discount_percentage, start_date, end_date, status) VALUES 
-(1, 'iPhone 13 Special Offer', 'Get 15% off on iPhone 13 for a limited time', 15.00, NOW(), '2026-03-31 23:59:59', 1),
-(2, 'Samsung Tablet Deal', 'Special discount on Samsung Galaxy Tab', 10.00, NOW(), '2026-03-15 23:59:59', 1);
-
-
-INSERT INTO reviews (user_id, product_id, rating, comment) VALUES 
-(1, 1, 5, 'Great product! The iPhone 13 is amazing.'),
-(1, 2, 4, 'Good tablet, but could be better.'),
-(2, 1, 5, 'Excellent quality and performance.');
-
-
-
-CREATE TABLE blogs (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    image VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-
-CREATE TABLE blog_comments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    blog_id INT NOT NULL,
-    user_id INT NOT NULL,
-    comment TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (blog_id) REFERENCES blogs(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-
-
-
-INSERT INTO blogs (user_id, title, content, image) VALUES 
-(1, 'Latest Tech Trends 2024', 'Exploring the newest technology trends...', 'blog1.jpg'),
-(1, 'Smartphone Comparison', 'Comparing the latest smartphones...', 'blog2.jpg');
-
-INSERT INTO blog_comments (blog_id, user_id, comment) VALUES 
-(1, 2, 'Great article! Very informative.'),
-(1, 1, 'Thanks for sharing these insights.');
-
-
-
+INSERT INTO products (name, description, price, discount, quantity, main_image, category_id, subcategory_id) VALUES 
+('iPhone 13', 'Latest Apple smartphone with advanced features', 999.99, 0, 50, 'Public\assets\front\img\product\iphone.jpeg', 1, 1),
+('Samsung Galaxy Tab', 'High-performance Android tablet', 499.99, 10, 30, 'Public\assets\front\img\product\s-l960.webp', 1, 2);
 
