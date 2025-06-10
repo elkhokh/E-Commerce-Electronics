@@ -1,0 +1,226 @@
+/* تنسيقات عامة لجميع صفحات المنتجات */
+.single-tranding,
+.product-item {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.single-tranding:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.single-tranding a,
+.product-item a {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.tranding-pro-img,
+.product-img {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+    height: 350px;
+}
+
+.tranding-pro-img img,
+.product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.single-tranding:hover .tranding-pro-img img,
+.product-item:hover .product-img img {
+    transform: scale(1.05);
+}
+
+.tranding-pro-info,
+.product-info {
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-top: 1px solid #eee;
+    flex: 1;
+    padding-bottom: 60px;
+}
+
+.tranding-pro-title {
+    flex: 1;
+    margin-right: 25px;
+    overflow: hidden;
+    max-width: calc(100% - 30px);
+}
+
+.tranding-pro-title h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 15px;
+}
+
+.tranding-pro-title h4 {
+    margin: 0;
+    font-size: 18px;
+    color: #fff;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    padding: 8px 12px;
+    background-color: #ff0000;
+    border-radius: 4px;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.tranding-pro-price {
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.price_box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.current_price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.old_price {
+    font-size: 18px;
+    color: #999;
+    text-decoration: line-through;
+    margin-top: 4px;
+}
+
+/* تنسيقات ألوان المنتج */
+.single-tranding .product-colors {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    justify-content: center;
+    z-index: 2;
+    margin-top: 10px;
+}
+
+.single-tranding .color-option {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    position: relative;
+}
+
+.single-tranding .color-option:hover {
+    transform: scale(1.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* تنسيق التلميح المشترك */
+.color-option::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.color-option:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: -30px;
+}
+
+/* تنسيقات صفحة تفاصيل المنتج */
+.product_variant.color {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 8px;
+}
+
+.product_variant.color h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.product_variant.color label {
+    display: block;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.product_variant.color .product-colors {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.product_variant.color .color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.product_variant.color .color-option:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+} 

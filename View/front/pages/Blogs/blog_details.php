@@ -3,7 +3,10 @@
 use App\Blogs;
 use App\User;
 use App\Comment_replies;
-$user_id = (int)$_SESSION['user']['id'];
+if (isset($_SESSION['user'])) {
+  $user_id = (int)$_SESSION['user']['id'];  
+}
+
 ?>
 	<!--blog body area start-->
     <div class="blog_details mt-60">
@@ -72,7 +75,8 @@ $user_id = (int)$_SESSION['user']['id'];
                                             <span><?= date('F j, Y', strtotime($comment['created_at']))?></span> 
                                         </div>
                                         <p><?= $comment['comment'] ?></p>
-                                        <?php if ($user_id == $comment['user_id']): ?>
+                                        <?php if (isset($_SESSION['user'])):
+                                        if ($user_id == $comment['user_id']): ?>
                                         <div class="comment_actions">
                                             <form action="index.php?page=Comment_controller&action=remove" method="post" style="display: inline;">
                                                 <input type="hidden" name="blog_id" value="<?= $blog->getId() ?>">
@@ -82,6 +86,7 @@ $user_id = (int)$_SESSION['user']['id'];
                                                 </button>
                                             </form>
                                         </div>
+                                        <?php endif; ?>
                                         <?php endif; ?>
                                         <div class="comment_reply_section">
                                             <div class="reply_button">
@@ -123,7 +128,8 @@ $user_id = (int)$_SESSION['user']['id'];
                                                 <span><?= date('F j, Y', strtotime($reply->getCreatedAt())) ?></span> 
                                             </div>
                                             <p><?= $reply->getReply() ?></p>
-                                        <?php if ($user_id ==$reply->getUserId()): ?>
+                                        <?php if (isset($_SESSION['user'])):
+                                        if ($user_id ==$reply->getUserId()): ?>
                                         <div class="comment_actions">
                                             <form action="index.php?page=Reply_controller&action=remove" method="post" style="display: inline;">
                                                 <input type="hidden" name="blog_id" value="<?= $blog->getId() ?>">
@@ -134,6 +140,7 @@ $user_id = (int)$_SESSION['user']['id'];
                                                 </button>
                                             </form>
                                         </div>
+                                        <?php endif; ?>
                                         <?php endif; ?>
                                         </div>
                                     </div>

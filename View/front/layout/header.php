@@ -21,6 +21,7 @@
     <!-- Main Style CSS -->
     <link rel="stylesheet" href="public/assets/front/css/style.css">
     <link rel="stylesheet" href="public/assets/front/css/custom.css">
+    <link rel="stylesheet" href="public/assets/front/css/product.css">
 
 </head>
 <?php 
