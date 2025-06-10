@@ -12,14 +12,16 @@ class User
     private string $email;
     private string $password;
     private string $role;
+    private int $status;
 
-    function __construct(int $id, string $name, string $email, string $password, string $role = "user")
+    function __construct(int $id, string $name, string $email, string $password, string $role = "user", int $status = 1)
     {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
         $this->role = $role;
+        $this->status = $status;
     }
     function get_id(): int
     {
@@ -45,16 +47,25 @@ class User
     {
         return $this->role;
     }
+    function get_status(): int
+    {
+        return $this->status;
+    }
+    function set_status(int $status): void
+    {
+        $this->status = $status;
+    }
 
-    static function create(PDO $pdo, string $name, string $email, string $password, string $role = "user"): ?User
+    static function register(PDO $pdo, string $name, string $email, string $password, string $role = "user", int $status = 1): ?User
     {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (name,email,password,role)
-        VALUES (:name,:email,:password,:role)");
+        $stmt = $pdo->prepare("INSERT INTO users (name,email,password,role,status)
+        VALUES (:name,:email,:password,:role,:status)");
         $stmt->bindParam(":name", $name);
         $stmt->bindParam(":email", $email);
         $stmt->bindParam(":password", $password_hash);
         $stmt->bindParam(":role", $role);
+        $stmt->bindParam(":status", $status);
        $user = $stmt->execute();
          
         if ($user) {
@@ -63,7 +74,25 @@ class User
                 "name" => $name,
                 "id" => $id
             ];
-            return new self($id, $name, $email, $password, $role = "user");
+            return new self($id, $name, $email, $password, $role, $status);
+        }
+        return null;
+    }
+    static function create(PDO $pdo, string $name, string $email, string $password, string $role = "user", int $status = 1): ?User
+    {
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO users (name,email,password,role,status)
+        VALUES (:name,:email,:password,:role,:status)");
+        $stmt->bindParam(":name", $name);
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":password", $password_hash);
+        $stmt->bindParam(":role", $role);
+        $stmt->bindParam(":status", $status);
+       $user = $stmt->execute();
+         
+        if ($user) {
+            $id = (int) $pdo->lastInsertId();
+            return new self($id, $name, $email, $password, $role, $status);
         }
         return null;
     }
@@ -84,7 +113,14 @@ class User
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new User($row['id'], $row['name'], $row['email'], $row['password'], $row['role']);
+            return new User(
+                $row['id'],
+                $row['name'],
+                $row['email'],
+                $row['password'],
+                $row['role'],
+                $row['status']
+            );
         }
         return null;
     }
@@ -95,7 +131,14 @@ class User
         $stmt->execute();
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new User($row['id'], $row['name'], $row['email'], $row['password'], $row['role']);
+            return new User(
+                $row['id'],
+                $row['name'],
+                $row['email'],
+                $row['password'],
+                $row['role'],
+                $row['status']
+            );
         }
         return null;
     }
@@ -128,6 +171,30 @@ class User
         return false;
     }
 
+    static function update_profile_image(PDO $pdo, int $user_id, string $new_image_path): bool
+    {
+        try {
+            $stmt = $pdo->prepare("UPDATE users SET profile_image = :profile_image WHERE id = :id");
+            $stmt->bindParam(":profile_image", $new_image_path);
+            $stmt->bindParam(":id", $user_id);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    static function get_profile_image(PDO $pdo, int $user_id): ?string
+    {
+        try {
+            $stmt = $pdo->prepare("SELECT profile_image FROM users WHERE id = :id");
+            $stmt->bindParam(":id", $user_id);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return $result ? $result['profile_image'] : null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
 
     public static function getRole(PDO $pdo, int $userId): ?string
     {
@@ -140,6 +207,152 @@ class User
             return $result ? $result['role'] : null;
         } catch (PDOException $e) {
             return null;
+        }
+    }
+
+    static function getAll(PDO $pdo, int $limit = 0, int $offset = 0): array
+    {
+        try {
+            $query = "SELECT * FROM users ORDER BY id ASC";
+            
+            if ($limit > 0) {
+                $query .= " LIMIT :limit";
+                if ($offset > 0) {
+                    $query .= " OFFSET :offset";
+                }
+            }
+
+            $stmt = $pdo->prepare($query);
+            
+            if ($limit > 0) {
+                $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
+                if ($offset > 0) {
+                    $stmt->bindParam(":offset", $offset, PDO::PARAM_INT);
+                }
+            }
+
+            $stmt->execute();
+            
+            $users = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $user = new User(
+                    $row['id'],
+                    $row['name'],
+                    $row['email'],
+                    $row['password'],
+                    $row['role'],
+                    $row['status']
+                );
+                $users[] = $user;
+            }
+            return $users;
+        } catch (PDOException $e) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $e->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return [];
+        }
+    }
+
+    static function findByName(PDO $pdo, string $name): ?User
+    {
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE name LIKE :name");
+            $searchTerm = "%{$name}%";
+            $stmt->bindParam(":name", $searchTerm);
+            $stmt->execute();
+            
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                return new User(
+                    $row['id'],
+                    $row['name'],
+                    $row['email'],
+                    $row['password'],
+                    $row['role'],
+                    $row['status']
+                );
+            }
+            return null;
+        } catch (PDOException $e) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $e->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return null;
+        }
+    }
+
+    static function updateStatus(PDO $pdo, int $user_id, int $status): bool
+    {
+        try {
+            $stmt = $pdo->prepare("UPDATE users SET status = :status WHERE id = :id");
+            $stmt->bindParam(":status", $status, PDO::PARAM_INT);
+            $stmt->bindParam(":id", $user_id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $e->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return false;
+        }
+    }
+
+    static function update(PDO $pdo, int $id, string $name, string $email, string $role, int $status): bool
+    {
+        try {
+            $stmt = $pdo->prepare("UPDATE users SET 
+                name = :name,
+                email = :email,
+                role = :role,
+                status = :status
+                WHERE id = :id");
+
+            $stmt->bindParam(":name", $name);
+            $stmt->bindParam(":email", $email);
+            $stmt->bindParam(":role", $role);
+            $stmt->bindParam(":status", $status, PDO::PARAM_INT);
+            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $e->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return false;
+        }
+    }
+
+    static function updateWithPassword(PDO $pdo, int $id, string $name, string $email, string $role, int $status, string $password): bool
+    {
+        try {
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            
+            $stmt = $pdo->prepare("UPDATE users SET 
+                name = :name,
+                email = :email,
+                role = :role,
+                status = :status,
+                password = :password
+                WHERE id = :id");
+
+            $stmt->bindParam(":name", $name);
+            $stmt->bindParam(":email", $email);
+            $stmt->bindParam(":role", $role);
+            $stmt->bindParam(":status", $status, PDO::PARAM_INT);
+            $stmt->bindParam(":password", $password_hash);
+            $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            if(file_exists('Config/log.log')) {
+                $error = date('Y-m-d H:i:s') . " - " . $e->getMessage() . "\n";
+                file_put_contents('Config/log.log', $error, FILE_APPEND);
+            }
+            return false;
         }
     }
 }

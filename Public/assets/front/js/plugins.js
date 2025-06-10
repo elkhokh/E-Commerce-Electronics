@@ -2412,71 +2412,84 @@ if ( typeof Object.create !== 'function' ) {
 
 		});
 	};
-	// Public/assets/front/js/reviews.js
-document.addEventListener('DOMContentLoaded', function() {
-    const ratingStars = document.querySelectorAll('.rating-stars i');
-    const reviewForm = document.getElementById('reviewForm');
-    let selectedRating = 0;
+	
 
-    // تفعيل النجوم عند التحويم
-    ratingStars.forEach(star => {
-        star.addEventListener('mouseover', function() {
-            const rating = this.dataset.rating;
-            updateStars(rating);
-        });
-
-        star.addEventListener('mouseout', function() {
-            updateStars(selectedRating);
-        });
-
-        star.addEventListener('click', function() {
-            selectedRating = this.dataset.rating;
-            updateStars(selectedRating);
-        });
-    });
-
-    // تحديث حالة النجوم
-    function updateStars(rating) {
-        ratingStars.forEach(star => {
-            const starRating = star.dataset.rating;
-            if (starRating <= rating) {
-                star.classList.remove('far');
-                star.classList.add('fas');
-            } else {
-                star.classList.remove('fas');
-                star.classList.add('far');
-            }
-        });
-    }
-
-    // إرسال التقييم
-    if (reviewForm) {
-        reviewForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (selectedRating === 0) {
-                alert('Please select a rating');
-                return;
-            }
-
-            const formData = new FormData(this);
-            formData.append('rating', selectedRating);
-
-            fetch(this.action, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            });
-        });
-    }
-});
-
+	document.addEventListener('DOMContentLoaded', function() {
+		const stars = document.querySelectorAll('.rating-stars li a');
+		const ratingInput = document.getElementById('rating');
+		const reviewForm = document.getElementById('reviewForm');
+	
+		stars.forEach(star => {
+			star.addEventListener('click', function(e) {
+				e.preventDefault();
+				const rating = this.getAttribute('data-rating');
+				ratingInput.value = rating;
+				
+				// Update stars appearance
+				stars.forEach(s => {
+					const starRating = s.getAttribute('data-rating');
+					if (starRating <= rating) {
+						s.classList.add('active');
+					} else {
+						s.classList.remove('active');
+					}
+				});
+			});
+	
+			star.addEventListener('mouseover', function() {
+				const rating = this.getAttribute('data-rating');
+				stars.forEach(s => {
+					const starRating = s.getAttribute('data-rating');
+					if (starRating <= rating) {
+						s.classList.add('active');
+					} else {
+						s.classList.remove('active');
+					}
+				});
+			});
+	
+			star.addEventListener('mouseout', function() {
+				const currentRating = ratingInput.value;
+				stars.forEach(s => {
+					const starRating = s.getAttribute('data-rating');
+					if (starRating <= currentRating) {
+						s.classList.add('active');
+					} else {
+						s.classList.remove('active');
+					}
+				});
+			});
+		});
+	
+		reviewForm.addEventListener('submit', function(e) {
+			e.preventDefault();
+			
+			if (ratingInput.value === '0') {
+				alert('Please select a rating');
+				return;
+			}
+	
+			const formData = new FormData(this);
+			
+			fetch(this.action, {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					alert('Review submitted successfully!');
+					location.reload();
+				} else {
+					alert(data.message || 'Error submitting review');
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				alert('Error submitting review');
+			});
+		});
+	});
 	$.fn.elevateZoom.options = {
 			zoomActivation: "hover", // Can also be click (PLACEHOLDER FOR NEXT VERSION)
       zoomEnabled: true, //false disables zoomwindow from showing

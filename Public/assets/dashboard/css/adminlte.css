@@ -53009,4 +53009,84 @@ a.text-muted:hover {
 .dark-mode .border-dark {
   border-color: #4b545c !important;
 }
+.card {
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  border: none;
+  margin-top: 20px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  border-top: none;
+  font-weight: 600;
+}
+
+.error-message {
+  font-family: monospace;
+  background-color: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid #dc3545;
+  margin: 5px 0;
+  word-break: break-all;
+}
+
+.badge {
+  padding: 8px 12px;
+  font-weight: 500;
+}
+
+.badge i {
+  margin-right: 5px;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.875rem;
+}
+
+.alert {
+  margin-bottom: 0;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.table tbody tr {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+
+@media (max-width: 768px) {
+  .card-header {
+      flex-direction: column;
+      gap: 10px;
+  }
+  
+  .table-responsive {
+      margin: 0 -15px;
+  }
+}
 /*# sourceMappingURL=adminlte.css.map */

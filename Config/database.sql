@@ -8,7 +8,8 @@ CREATE TABLE if not exists users (
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') DEFAULT 'user',
     status TINYINT(1) DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_image VARCHAR(255) DEFAULT 'Public/assets/front/img/users/default_user.png' AFTER email
 );
 
 
@@ -84,11 +85,8 @@ CREATE TABLE if not exists order_items (
 
 CREATE TABLE if not exists discounts (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    code VARCHAR(50) UNIQUE NOT NULL,
-    type ENUM('percentage', 'fixed') NOT NULL,
-    value DECIMAL(10,2) NOT NULL,
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    value INT NOT NULL,
     status TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -166,7 +164,60 @@ INSERT INTO subcategories (category_id, name, description) VALUES
 (1, 'Tablets', 'Tablets and accessories');
 
 -- Insert test products
-INSERT INTO products (name, description, price, discount, quantity, main_image, category_id, subcategory_id) VALUES 
-('iPhone 13', 'Latest Apple smartphone with advanced features', 999.99, 0, 50, 'Public\assets\front\img\product\iphone.jpeg', 1, 1),
-('Samsung Galaxy Tab', 'High-performance Android tablet', 499.99, 10, 30, 'Public\assets\front\img\product\s-l960.webp', 1, 2);
+INSERT INTO products (name, description, price, quantity, main_image, category_id, subcategory_id) VALUES 
+('iPhone 13', 'Latest Apple smartphone with advanced features', 999.99, 50, 'Public\assets\front\img\product\iphone.jpeg', 1, 1),
+('Samsung Galaxy Tab', 'High-performance Android tablet', 499.99, 30, 'Public\assets\front\img\product\s-l960.webp', 1, 2);
+
+INSERT INTO discounts (code, type, value, start_date, end_date, status) 
+VALUES 
+('SUMMER2024', 'percentage', 20.00, now(), '2024-03-31 23:59:59', 1),
+('WELCOME50', 'fixed', 50.00, now(), '2026-03-07 23:59:59', 1);
+
+
+INSERT INTO offers (product_id, title, description, discount_percentage, start_date, end_date, status) VALUES 
+(1, 'iPhone 13 Special Offer', 'Get 15% off on iPhone 13 for a limited time', 15.00, NOW(), '2026-03-31 23:59:59', 1),
+(2, 'Samsung Tablet Deal', 'Special discount on Samsung Galaxy Tab', 10.00, NOW(), '2026-03-15 23:59:59', 1);
+
+
+INSERT INTO reviews (user_id, product_id, rating, comment) VALUES 
+(1, 1, 5, 'Great product! The iPhone 13 is amazing.'),
+(1, 2, 4, 'Good tablet, but could be better.'),
+(2, 1, 5, 'Excellent quality and performance.');
+
+
+
+CREATE TABLE blogs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    image VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE blog_comments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    blog_id INT NOT NULL,
+    user_id INT NOT NULL,
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (blog_id) REFERENCES blogs(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+
+
+INSERT INTO blogs (user_id, title, content, image) VALUES 
+(1, 'Latest Tech Trends 2024', 'Exploring the newest technology trends...', 'blog1.jpg'),
+(1, 'Smartphone Comparison', 'Comparing the latest smartphones...', 'blog2.jpg');
+
+INSERT INTO blog_comments (blog_id, user_id, comment) VALUES 
+(1, 2, 'Great article! Very informative.'),
+(1, 1, 'Thanks for sharing these insights.');
+
+
+
 

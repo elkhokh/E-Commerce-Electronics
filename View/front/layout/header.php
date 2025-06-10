@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Drophut - Single Product eCommerce Template</title>
+    <title>ElectroWorld - Your Electronics Universe</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Favicon -->
@@ -21,6 +21,7 @@
     <!-- Main Style CSS -->
     <link rel="stylesheet" href="public/assets/front/css/style.css">
     <link rel="stylesheet" href="public/assets/front/css/custom.css">
+    <link rel="stylesheet" href="public/assets/front/css/product.css">
 
 </head>
 <?php 
@@ -28,14 +29,15 @@ use App\Massage;
 use App\Cart;
 use App\User;
 
+
 $cart = null;
 $user_email = null;
-
+$profile_image ='Public\assets\front\img\users\default_user.jpg';
 if (isset($db)) {
     if (isset($_SESSION['user']['id'])) {
         $cart = new Cart($_SESSION['user']['id']);
         $cart->load($db);
-        
+         $profile_image =$_SESSION['user'] ? User::get_profile_image($db, $_SESSION['user']['id']) : 'Public/assets/front/img/users/default_user.png';
         try {
             $user = User::find_by_id($db, $_SESSION['user']['id']);
             $user_email = $user->get_email();
@@ -47,6 +49,7 @@ if (isset($db)) {
     include 'View/Error/Maintenance.php';
     exit;
 }
+//var_dump(   $user = User::find_by_id($db, $_SESSION['user']['id'])); 
 ?>
 
 <body>
@@ -77,12 +80,17 @@ if (isset($db)) {
                         <div class="top_right text-right">
                             <ul>
                                <?php if (isset($_SESSION['user'])): ?>
-                                   <li><a href="index.php?page=my-account">My Account</a></li>
+                                   <li><a href="index.php?page=Logout">Logout</a></li>
                                <?php else: ?>
                                    <li><a href="index.php?page=Login">Login</a></li>
                                    <li><a href="index.php?page=register">Register</a></li>
                                <?php endif; ?>
-                               <li><a href="index.php?page=Cart">Cart</a></li> 
+                               <li>
+                                   <a href="index.php?page=my_account">
+                                       <div class="user-mini-profile">
+                                           <img src="<?php echo $profile_image; ?>" alt="User Profile" class="user-mini-avatar">
+                                       </div></a>
+                               </li> 
                             </ul>
                         </div> 
                         <div class="search_container">
@@ -96,10 +104,10 @@ if (isset($db)) {
                         
                         <div class="middel_right_info">
                             <div class="header_wishlist">
-                                <a href="wishlist.html"><img src="public/assets/front/img/user.png" alt=""></a>
+                                <a href="index.php?page=Wishlist"><img src="public/assets/front/img/user.png" alt="user"></a>
                             </div>
                             <div class="mini_cart_wrapper">
-                                <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
+                                <a href="index.php?page=Cart"><img src="public/assets/front/img/shopping-bag.png" alt="cart"></a>
                                 <?php if($cart && $cart->getItemsCount() > 0): ?>
                                     <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
                                 <?php endif; ?>
@@ -140,7 +148,7 @@ if (isset($db)) {
                                             </div>
                                         </div>
                                     <?php else: ?>
-                                        <p>Your cart is empty</p>
+                                        <div class="alert alert-info">Your cart is empty .</div>
                                     <?php endif; ?>
                                 </div>
                                 <!--mini cart end-->
@@ -153,15 +161,12 @@ if (isset($db)) {
                                 </li>
                                 <li><a class="active" href="">page <i class="fa fa-angle-down"></i></a>
                                     <ul class="sub_menu pages">
-                                        <li><a href="index.php?page=Wishlist"></a></li>
-                                        <li><a href="index.php?page=All_product"></a></li>
+                                       <li><a href="index.php?page=about">About Us</a></li>
+                                       <li><a href="index.php?page=frequently">Frequently Questions</a></li>
+                                       <li><a href="index.php?page=privacy_policy">Privacy Policy</a></li>
                                    </ul>
                                 </li>
-                                <li><a class="active" href="">Product <i class="fa fa-angle-down"></i></a>
-                                    <ul class="sub_menu pages">
-                                        <li><a href="index.php?page=Wishlist">Wishlist</a></li>
-                                        <li><a href="index.php?page=All_product">All Product</a></li>
-                                   </ul>
+                                <li><a class="active" href="index.php?page=All_product">Product </a>
                                 </li>
                                 <li class="menu-item-has-children">
                                     <a href="index.php?page=All_Blogs">blog</a>
@@ -210,7 +215,14 @@ if (isset($db)) {
                                         <li><a href="index.php?page=Login">Login</a></li>
                                         <li><a href="index.php?page=register">Register</a></li>
                                     <?php endif; ?>
-                                    <li><a href="index.php?page=Cart">Cart</a></li> 
+                                    <li>
+                                        <a href="index.php?page=my_account">
+
+                                       <div class="user-mini-profile">
+                                           <img src="<?php echo $profile_image; ?>" alt="User Profile" class="user-mini-avatar">
+                                       </div>
+                             
+                                    </a></li> 
                                 </ul>
                             </div>   
                         </div>
@@ -224,7 +236,7 @@ if (isset($db)) {
                     <div class="row align-items-center">
                         <div class="col-lg-3 col-md-6">
                             <div class="logo">
-                                <a href="index.php?page=home"><img src="public/assets/front/img/logo/logo.png" alt=""></a>
+                                <a href="index.php?page=home"><img src="public/assets/front/img/logo/logo.jpg" alt="ElectroWorld"></a>
                             </div>
                         </div>
                         <div class="col-lg-9 col-md-6">
@@ -239,10 +251,10 @@ if (isset($db)) {
                                 </div>
                                 <div class="middel_right_info">
                                     <div class="header_wishlist">
-                                        <a href="#"><img src="public/assets/front/img/user.png" alt=""></a>
+                                        <a href="index.php?page=Wishlist"><img src="public/assets/front/img/user.png" alt="user"></a>
                                     </div>
                                     <div class="mini_cart_wrapper">
-                                        <a href="javascript:void(0)"><img src="public/assets/front/img/shopping-bag.png" alt=""></a>
+                                        <a href="index.php?page=Cart"><img src="public/assets/front/img/shopping-bag.png" alt="cart"></a>
                                         <?php if($cart && $cart->getItemsCount() > 0): ?>
                                             <span class="cart_quantity"><?=$cart->getItemsCount()?></span>
                                         <?php endif; ?>
@@ -283,7 +295,7 @@ if (isset($db)) {
                                                     </div>
                                                 </div>
                                             <?php else: ?>
-                                                <p>Your cart is empty</p>
+                                                <div class="alert alert-info">Your cart is empty .</div>
                                             <?php endif; ?>
                                         </div>
                                         <!--mini cart end-->
@@ -306,15 +318,12 @@ if (isset($db)) {
                                         <li><a href="index.php?page=home">home</a></li>
                                         <li><a class="active" href="">Page <i class="fa fa-angle-down"></i></a>
                                             <ul class="sub_menu pages">
-                                                <li><a href="index.php?page=Wishlist"></a></li>
-                                                <li><a href="index.php?page=All_product"></a></li>
+                                                <li><a href="index.php?page=about">About Us</a></li>
+                                                <li><a href="index.php?page=frequently">Frequently Questions</a></li>
+                                                <li><a href="index.php?page=privacy_policy">Privacy Policy</a></li>
                                             </ul>
                                         </li>
-                                        <li><a class="active" href="">Product <i class="fa fa-angle-down"></i></a>
-                                            <ul class="sub_menu pages">
-                                                <li><a href="index.php?page=Wishlist">Wishlist</a></li>
-                                                <li><a href="index.php?page=All_product">All Product</a></li>
-                                            </ul>
+                                        <li><a class="active" href="index.php?page=All_product">Product </a>
                                         </li>
                                         <li><a href="index.php?page=All_Blogs">blogs</a>
                                         </li>
@@ -331,3 +340,20 @@ if (isset($db)) {
     <?php
     Massage::show_Massages();
     ?>
+
+<style>
+    .user-mini-profile {
+        display: inline-block;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+    
+    .user-mini-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #007bff;
+        vertical-align: middle;
+    }
+</style>

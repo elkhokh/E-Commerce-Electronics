@@ -2,7 +2,11 @@
 
 use App\Blogs;
 use App\User;
-$user_id = (int)$_SESSION['user']['id'];
+use App\Comment_replies;
+if (isset($_SESSION['user'])) {
+  $user_id = (int)$_SESSION['user']['id'];  
+}
+
 ?>
 	<!--blog body area start-->
     <div class="blog_details mt-60">
@@ -22,8 +26,8 @@ $user_id = (int)$_SESSION['user']['id'];
                                <div class="post_header">
                                    <h3 class="post_title"><?= $blog->getTitle() ?></h3>
                                     <div class="blog_meta">                                        
-                                        <span class="author">Posted by : <a href="#">Rahul</a> / </span>
-                                        <span class="post_date"><a href="#">Sep 20, 2019</a></span>
+                                        <span class="author">Posted by : <a href="">admin</a> / </span>
+                                        <span class="post_date"><a href=""><?= date('F j, Y', strtotime($blog->getCreatedAt())) ?></a></span>
                                     </div>
                                 </div>
                                 <div class="blog_thumb">
@@ -56,34 +60,93 @@ $user_id = (int)$_SESSION['user']['id'];
                             </figure>
                         </article>
                         <div class="comments_box">
-                            <h3><?= $blog->getCommentCount($db) ?> Comments	</h3>
-                            <?php
-                            foreach ($blog->getComments($db) as  $comment) :
-                                // var_dump($comment['id']);
+                            <h3><?= $blog->getCommentCount($db) ?> Comments</h3>
+                            <?php foreach ($blog->getComments($db) as $comment) :
+                                $profile_image = User::get_profile_image($db, $comment['user_id']);
                             ?>
-                            <div class="comment_list">
+                            <div class="reviews_comment_box">
                                 <div class="comment_thumb">
-                                    <img src="assets/img/blog/comment3.png.jpg" alt="">
+                                    <img src="<?=$profile_image?>" alt="" class="rounded-circle">
                                 </div>
-                                <div class="comment_content">
-                                    <div class="comment_meta">
-                                        <h5><a href="#"><?= User::find_by_id($db,$comment['user_id'])->get_name() ?></a></h5>
-                                        <span><?= date('F j, Y', strtotime($comment['created_at']))?></span> 
-                                    </div>
-                                    <p><?= $comment['comment'] ?></p>
-                                    <div class="comment_reply">
-                                    <?php if ($user_id==$comment['user_id']) :
-                                     ?>
-                                       <form action="index.php?page=Comment_controller&action=remove" method="post">
-                                        <input type="hidden" value="<?= $blog->getId() ?>" name="blog_id">
-                                        <input type="hidden" value="<?= $comment['id']?>" name="comment_id">
-                                       <button class="button" type="submit" style="background-color: #000; color: #fff;">Delete</button>
-                                      </form>  
-                                    <?php endif; ?>
+                                <div class="comment_text">
+                                    <div class="reviews_meta">
+                                        <div class="comment_meta">
+                                            <h5><a href="#"><?= User::find_by_id($db,$comment['user_id'])->get_name() ?></a></h5>
+                                            <span><?= date('F j, Y', strtotime($comment['created_at']))?></span> 
+                                        </div>
+                                        <p><?= $comment['comment'] ?></p>
+                                        <?php if (isset($_SESSION['user'])):
+                                        if ($user_id == $comment['user_id']): ?>
+                                        <div class="comment_actions">
+                                            <form action="index.php?page=Comment_controller&action=remove" method="post" style="display: inline;">
+                                                <input type="hidden" name="blog_id" value="<?= $blog->getId() ?>">
+                                                <input type="hidden" name="comment_id" value="<?= $comment['id'] ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <?php endif; ?>
+                                        <?php endif; ?>
+                                        <div class="comment_reply_section">
+                                            <div class="reply_button">
+                                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#replyForm<?= $comment['id'] ?>" aria-expanded="false">
+                                                    <i class="fa fa-reply"></i> Reply
+                                                </button>
+                                            </div>
+                                            <div class="collapse reply_form" id="replyForm<?= $comment['id'] ?>">
+                                                <div class="card card-body">
+                                                    <form action="index.php?page=Reply_controller&action=add" method="post">
+                                                        <input type="hidden" name="blog_id" value="<?= $blog->getId() ?>">
+                                                        <input type="hidden" name="comment_id" value="<?= $comment['id'] ?>">
+                                                        <div class="form-group">
+                                                            <label for="reply_comment<?= $comment['id'] ?>">Your Reply</label>
+                                                            <textarea class="form-control" name="comment" id="reply_comment<?= $comment['id'] ?>" rows="3" required></textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary">Submit Reply</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
                             </div>
+                            <?php
+                                foreach (Comment_replies::getRepliesForComment($db, $comment['id']) as $reply): 
+                                    $reply_user = User::find_by_id($db, $reply->getUserId());
+                                    $reply_profile_image = User::get_profile_image($db, $reply->getUserId());
+                            ?>
+                            <div class="comment_list list_two">
+                                <div class="reviews_comment_box">
+                                    <div class="comment_thumb">
+                                        <img src="<?= $reply_profile_image ?>" alt="" class="rounded-circle">
+                                    </div>
+                                    <div class="comment_text">
+                                        <div class="reviews_meta">
+                                            <div class="comment_meta">
+                                                <h5><a href="#"><?= $reply_user->get_name() ?></a></h5>
+                                                <span><?= date('F j, Y', strtotime($reply->getCreatedAt())) ?></span> 
+                                            </div>
+                                            <p><?= $reply->getReply() ?></p>
+                                        <?php if (isset($_SESSION['user'])):
+                                        if ($user_id ==$reply->getUserId()): ?>
+                                        <div class="comment_actions">
+                                            <form action="index.php?page=Reply_controller&action=remove" method="post" style="display: inline;">
+                                                <input type="hidden" name="blog_id" value="<?= $blog->getId() ?>">
+                                                <input type="hidden" name="comment_id" value="<?= $comment['id'] ?>">
+                                                <input type="hidden" name="reply_id" value="<?= $reply->getId() ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <?php endif; ?>
+                                        <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
                             <?php endforeach; ?>
                         </div>
                         <div class="comments_form">
@@ -113,7 +176,7 @@ $user_id = (int)$_SESSION['user']['id'];
                     <div class="blog_sidebar_widget">
                         <div class="widget_list widget_search">
                             <h3>Search</h3>
-                            <form action="index.php" method="GET">
+                            <form action="index.php?page=blog_search" method="Post">
                                 <input type="hidden" name="page" value="blogs">
                                 <input type="text" name="search" placeholder="Search...">
                                 <button type="submit">search</button>
@@ -158,3 +221,4 @@ $user_id = (int)$_SESSION['user']['id'];
         </div>
     </div>
     <!--blog section area end-->
+
