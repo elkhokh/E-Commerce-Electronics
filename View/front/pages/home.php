@@ -59,36 +59,38 @@ $isLoggedIn = isset($_SESSION['user']);
                     <div class="single-tranding">
                         <a href="index.php?page=product_details&id=<?= $product->getId() ?>">
                             <div class="tranding-pro-img">
-                                <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>" style="width: 100%; height: 300px; object-fit: cover;">
+                                <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>">
                             </div>
-                            <div class="tranding-pro-title">
-                                <h3><?= $product->getName() ?></h3>
-                                <?php 
-                                $subcategory = $product->getSubcategory($db);
-                                if ($subcategory): 
-                                ?>
-                                    <h4><?= $subcategory['name'] ?></h4>
-                                <?php endif; ?>
-                            </div>
-                            <div class="tranding-pro-price">
-                                <div class="price_box">
-                                    <span class="current_price">$<?= $product->getFinalPrice($db) ?></span>
-                                    <?php if ($product->getDiscount($db) > 0): ?>
-                                        <span class="old_price">$<?= $product->getPrice() ?></span>
+                            <div class="tranding-pro-info">
+                                <div class="tranding-pro-title">
+                                    <h3><?= $product->getName() ?></h3>
+                                    <?php 
+                                    $subcategory = $product->getSubcategory($db);
+                                    if ($subcategory): 
+                                    ?>
+                                        <h4><?= $subcategory['name'] ?></h4>
                                     <?php endif; ?>
                                 </div>
+                                <div class="tranding-pro-price">
+                                    <div class="price_box">
+                                        <span class="current_price">$<?= $product->getFinalPrice($db) ?></span>
+                                        <?php if ($product->getDiscount($db) > 0): ?>
+                                            <span class="old_price">$<?= $product->getPrice() ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </div>
-                            <?php if ($isLoggedIn): ?>
-                            <div class="product-colors">
-                                <?php foreach ($product->getColors($db) as $color): ?>
-                                    <span class="color-option" 
-                                          style="background-color: <?= $color['code'] ?>" 
-                                          title="<?= $color['name'] ?>">
-                                    </span>
-                                <?php endforeach; ?>
-                            </div>
-                            <?php endif; ?>
                         </a>
+                        
+                        <div class="product-colors">
+                            <?php foreach ($product->getColors($db) as $color): ?>
+                                <span class="color-option" 
+                                      style="background-color: <?= $color['code'] ?>" 
+                                      title="<?= $color['name'] ?>">
+                                </span>
+                            <?php endforeach; ?>
+                        </div>
+                        
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -201,23 +203,25 @@ if ($isLoggedIn) {
                         <div class="single-tranding">
                             <a href="index.php?page=product_details&id=<?= $product->getId() ?>">
                                 <div class="tranding-pro-img">
-                                    <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>" style="width: 100%; height: 300px; object-fit: cover;">
+                                    <img src="<?= $product->getMainImage() ?>" alt="<?= $product->getName() ?>">
                                 </div>
-                                <div class="tranding-pro-title">
-                                    <h3><?= $product->getName() ?></h3>
-                                    <?php 
-                                    $subcategory = $product->getSubcategory($db);
-                                    if ($subcategory): 
-                                    ?>
-                                        <h4><?= $subcategory['name'] ?></h4>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="tranding-pro-price">
-                                    <div class="price_box">
-                                        <span class="current_price">$<?= $product->getFinalPrice($db) ?></span>
-                                        <?php if ($product->getDiscount($db) > 0): ?>
-                                            <span class="old_price">$<?= $product->getPrice() ?></span>
+                                <div class="tranding-pro-info">
+                                    <div class="tranding-pro-title">
+                                        <h3><?= $product->getName() ?></h3>
+                                        <?php 
+                                        $subcategory = $product->getSubcategory($db);
+                                        if ($subcategory): 
+                                        ?>
+                                            <h4><?= $subcategory['name'] ?></h4>
                                         <?php endif; ?>
+                                    </div>
+                                    <div class="tranding-pro-price">
+                                        <div class="price_box">
+                                            <span class="current_price">$<?= $product->getFinalPrice($db) ?></span>
+                                            <?php if ($product->getDiscount($db) > 0): ?>
+                                                <span class="old_price">$<?= $product->getPrice() ?></span>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
@@ -376,7 +380,6 @@ if ($isLoggedIn) {
         </div>
     </section>
     <!--shipping area end-->
-    
 	
 
 	
