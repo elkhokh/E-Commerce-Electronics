@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 require_once "vendor/autoload.php";
@@ -12,7 +13,7 @@ use App\User;
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
 if (isset($_SESSION['user']['id'])) {
- $user_id =  (int)$_SESSION['user']['id']  ;
+    $user_id = (int)$_SESSION['user']['id'];
 }
 $db = null;
 
