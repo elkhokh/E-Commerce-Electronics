@@ -212,15 +212,30 @@ class Product {
     }
   
     
-    public function update(PDO $db, string $name, string $description, float $price, int $quantity, array $main_image, int $category_id, ?int $subcategory_id = null, array $colors = [], int $status = 1): bool {
+    public function update(PDO $db, int $id, string $name, string $description, float $price, int $quantity, array $main_image, int $category_id, ?int $subcategory_id = null, array $colors = [], int $status = 1): bool {
         try {
             $db->beginTransaction();
-            $product = new Product();
-            $product->setName($name); 
             
-            $main_image = MangesFiles::UploadFile($main_image, ['jpg','png','jpeg'], "Public/assets/front/img/product/{$name}");
-            if(!$main_image){
+
+            $old_product = self::findById($db, $id);
+            if (!$old_product) {
                 return false;
+            }
+
+          
+            if (!empty($main_image['name'])) {
+                $old_image_path = $old_product->getMainImage();
+                if (file_exists($old_image_path)) {
+                    unlink($old_image_path);
+                }
+                
+                $main_image = MangesFiles::UploadFile($main_image, ['jpg','png','jpeg'], "Public/assets/front/img/product/{$name}");
+                if(!$main_image){
+                    return false;
+                }
+                $image_path = $main_image['path'];
+            } else {
+                $image_path = $old_product->getMainImage();
             }
 
             $query = "UPDATE products 
@@ -236,12 +251,12 @@ class Product {
             
             $stmt = $db->prepare($query);
             $result = $stmt->execute([
-                'id' => $this->id,
+                'id' => $id,
                 'name' => $name,
                 'description' => $description,
                 'price' => $price,
                 'quantity' => $quantity,
-                'main_image' => $main_image['path'],
+                'main_image' => $image_path,
                 'category_id' => $category_id,
                 'subcategory_id' => $subcategory_id,
                 'status' => $status

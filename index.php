@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 require_once "vendor/autoload.php";
@@ -12,7 +13,7 @@ use App\User;
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
 if (isset($_SESSION['user']['id'])) {
- $user_id =  (int)$_SESSION['user']['id']  ;
+    $user_id = (int)$_SESSION['user']['id'];
 }
 $db = null;
 
@@ -102,6 +103,8 @@ if ($user_type==='user') {
         'register' => 'View/front/pages/auth/register.php',
         'forget_password' => 'View/front/pages/auth/forgetPassword.php',
         'Cart' => 'View/front/pages/Cart_page.php',
+        'verify_email' => 'View/front/pages/auth/verify_email.php',
+        'verify_email_controller' => 'App/controller/auth/verify_email_controller.php',
         'register_controller' => 'App/controller/auth/register_controller.php',
         'Login_controller' => 'App/controller/auth/Login_controller.php',
         'update_profile' => 'App/controller/auth/update_profile_controller.php',
@@ -132,6 +135,8 @@ if ($user_type==='user') {
         'all_orders' => 'View/front/pages/all_orders.php',
         'Wishlist' => 'View/front/pages/product/Wishlist.php',
         'All_product' => 'View/front/pages/product/All_product.php',
+        'reset_password' => 'View/front/pages/auth/reset_password.php',
+        'request_password_reset_controller' => 'App/controller/auth/request_password_reset_controller.php',
         'Login' => 'View/front/pages/auth/login.php'
     ];
     if ($page==='admin') {

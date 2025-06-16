@@ -84,3 +84,5 @@
 2025-06-10 15:25:04 - SQLSTATE[42S02]: Base table or view not found: 1146 Table 'e_commerce_electronics.offers' doesn't exist
 2025-06-10 15:25:04 - SQLSTATE[42S02]: Base table or view not found: 1146 Table 'e_commerce_electronics.offers' doesn't exist
 2025-06-10 15:25:04 - SQLSTATE[42S02]: Base table or view not found: 1146 Table 'e_commerce_electronics.blogs' doesn't exist
+2025-06-10 19:36:35 - SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '11-41' for key 'unique_wishlist'
+2025-06-10 19:42:53 - SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`e_commerce_electronics`.`offers`, CONSTRAINT `offers_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE)

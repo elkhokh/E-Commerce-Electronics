@@ -4,17 +4,22 @@ namespace App;
 
 use PDO;
 use PDOException;
+use App\Traits\Mailer;
 
 class User
 {
+    use Mailer;
+
     private int $id;
     private string $name;
     private string $email;
     private string $password;
     private string $role;
     private int $status;
+    private ?string $verification_code;
+    private ?string $verification_code_expires;
 
-    function __construct(int $id, string $name, string $email, string $password, string $role = "user", int $status = 1)
+    function __construct(int $id, string $name, string $email, string $password, string $role = "user", int $status = 1, ?string $verification_code = null, ?string $verification_code_expires = null)
     {
         $this->id = $id;
         $this->name = $name;
@@ -22,6 +27,8 @@ class User
         $this->password = $password;
         $this->role = $role;
         $this->status = $status;
+        $this->verification_code = $verification_code;
+        $this->verification_code_expires = $verification_code_expires;
     }
     function get_id(): int
     {
@@ -56,25 +63,32 @@ class User
         $this->status = $status;
     }
 
-    static function register(PDO $pdo, string $name, string $email, string $password, string $role = "user", int $status = 1): ?User
+    static function register(PDO $pdo, string $name, string $email, string $password, string $role = "user", int $status = 0): ?User
     {
+        $verification_code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $verification_code_expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
+        
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (name,email,password,role,status)
-        VALUES (:name,:email,:password,:role,:status)");
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role, status, verification_code, verification_code_expires)
+        VALUES (:name, :email, :password, :role, :status, :verification_code, :verification_code_expires)");
+        
         $stmt->bindParam(":name", $name);
         $stmt->bindParam(":email", $email);
         $stmt->bindParam(":password", $password_hash);
         $stmt->bindParam(":role", $role);
         $stmt->bindParam(":status", $status);
-       $user = $stmt->execute();
+        $stmt->bindParam(":verification_code", $verification_code);
+        $stmt->bindParam(":verification_code_expires", $verification_code_expires);
+        
+        $user = $stmt->execute();
          
         if ($user) {
             $id = (int) $pdo->lastInsertId();
-            $_SESSION["user"] = [
-                "name" => $name,
-                "id" => $id
-            ];
-            return new self($id, $name, $email, $password, $role, $status);
+            $newUser = new self($id, $name, $email, $password, $role, $status, $verification_code, $verification_code_expires);
+            
+            $newUser->sendVerificationEmail($email, $verification_code, 'register');
+            
+            return $newUser;
         }
         return null;
     }
@@ -352,6 +366,77 @@ class User
                 $error = date('Y-m-d H:i:s') . " - " . $e->getMessage() . "\n";
                 file_put_contents('Config/log.log', $error, FILE_APPEND);
             }
+            return false;
+        }
+    }
+
+    static function verify_email(PDO $pdo, string $email, string $code): bool
+    {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email AND verification_code = :code AND verification_code_expires > NOW()");
+        $stmt->bindParam(":email", $email);
+        $stmt->bindParam(":code", $code);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() > 0) {
+
+            $updateStmt = $pdo->prepare("UPDATE users SET status = 1, verification_code = NULL, verification_code_expires = NULL WHERE email = :email");
+            $updateStmt->bindParam(":email", $email);
+            return $updateStmt->execute();
+        }
+        return false;
+    }
+
+    static function request_password_reset(PDO $pdo, string $email): bool
+    {
+        $user = self::find_by_email($pdo, $email);
+        if ($user) {
+            $verification_code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $verification_code_expires = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+            
+            $stmt = $pdo->prepare("UPDATE users SET verification_code = :code, verification_code_expires = :expires WHERE email = :email");
+            $stmt->bindParam(":code", $verification_code);
+            $stmt->bindParam(":expires", $verification_code_expires);
+            $stmt->bindParam(":email", $email);
+            
+            if ($stmt->execute()) {
+                $user->sendVerificationEmail($email, $verification_code, 'reset');
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static function verify_reset_code(PDO $pdo, string $email, string $code): bool
+    {
+        try {
+            $stmt = $pdo->query("SELECT * FROM users WHERE email = :email AND verification_code = :code AND verification_code_expires > NOW()");
+            $stmt->bindParam(":email", $email);
+            $stmt->bindParam(":code", $code);
+            $stmt->execute();
+            
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error verifying reset code: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    static function reset_password(PDO $pdo, string $email, string $code, string $new_password): bool
+    {
+        try {
+
+            if (self::verify_email($pdo, $email, $code)) {
+                return false;
+            }
+
+            $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE users SET password = :password, verification_code = NULL, verification_code_expires = NULL WHERE email = :email");
+            $stmt->bindParam(":password", $password_hash);
+            $stmt->bindParam(":email", $email);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error resetting password: " . $e->getMessage());
             return false;
         }
     }
