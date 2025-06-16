@@ -29,14 +29,10 @@
                         </div>
                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
                             <div class="account-content">
-                                <form action="index.php?page=change_password" method="post">
+                                <form action="index.php?page=request_password_reset_controller" method="post">
                                     <div class="single-acc-field">
                                         <label for="email">Email</label>
                                         <input type="email" name="email" id="email" placeholder="Enter your Email">
-                                    </div>
-                                    <div class="single-acc-field">
-                                        <label for="new_password">New Password</label>
-                                        <input type="password" name="new_password" id="new_password" placeholder="Enter your Email">
                                     </div>
                                     <div class="single-acc-field">
                                         <button type="submit">Reset Password</button>
